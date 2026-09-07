@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { BASE_SEPOLIA, BASE_CHAIN_ID, type ChainConfig } from "@/lib/litdex";
+import { BASE_MAINNET, BASE_CHAIN_ID, type ChainConfig } from "@/lib/litdex";
 
 type Eip1193 = {
   request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
@@ -98,7 +98,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const disconnect = useCallback(() => setAddress(null), []);
 
-  const switchNetwork = useCallback(async (target: ChainConfig = BASE_SEPOLIA) => {
+  const switchNetwork = useCallback(async (target: ChainConfig = BASE_MAINNET) => {
     const eth = getEthereum();
     if (!eth) return;
     try {

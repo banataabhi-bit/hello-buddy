@@ -76,7 +76,7 @@ export function GameModal({ open, onOpenChange }: { open: boolean; onOpenChange:
           ) : !correctNetwork ? (
             <div className="rounded-[2rem] border-2 border-dashed border-black/15 bg-[#F4F4F2] p-10 text-center">
               <p className="btn-text text-black/60">
-                You&apos;re on another network — switch to Base Sepolia to play.
+                You&apos;re on another network — switch to Base Mainnet to play.
               </p>
               <button
                 onClick={() => void switchNetwork()}

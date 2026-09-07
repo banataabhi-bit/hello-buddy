@@ -108,7 +108,7 @@ export function ClaimModal({ open, onOpenChange }: { open: boolean; onOpenChange
             Claim from LitVM
           </DialogTitle>
           <DialogDescription className="btn-text text-white/70">
-            Burn points on LitVM and mint them as spendable points on Base Sepolia.
+            Burn points on LitVM and mint them as spendable points on Base Mainnet.
           </DialogDescription>
         </DialogHeader>
 
@@ -180,7 +180,7 @@ export function ClaimModal({ open, onOpenChange }: { open: boolean; onOpenChange
           )}
           {!correctNetwork && (
             <p className="btn-text text-center text-[#FF8080]">
-              Claiming on-chain requires Base Sepolia.
+              Claiming on-chain requires Base Mainnet.
             </p>
           )}
         </div>

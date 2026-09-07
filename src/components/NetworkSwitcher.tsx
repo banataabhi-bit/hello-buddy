@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useWallet } from "@/hooks/useWallet";
-import { BASE_SEPOLIA, LITVM, chainName, parseWalletError, type ChainConfig } from "@/lib/litdex";
+import { BASE_MAINNET, LITVM, chainName, parseWalletError, type ChainConfig } from "@/lib/litdex";
 
 export function NetworkSwitcher({ tone = "light" }: { tone?: "light" | "dark" }) {
   const { chainId, switchNetwork, address } = useWallet();
@@ -28,7 +28,7 @@ export function NetworkSwitcher({ tone = "light" }: { tone?: "light" | "dark" })
         Network: {chainName(chainId)}
         {chainId !== null && ` (${chainId})`}
       </span>
-      {[BASE_SEPOLIA, LITVM].map((c) => {
+      {[BASE_MAINNET, LITVM].map((c) => {
         const active = chainId === c.chainId;
         return (
           <button
