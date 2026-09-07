@@ -474,7 +474,7 @@ export function MintCard() {
             <div
               className={
                 voucherData && voucherData.totalVouchers > 0
-                  ? "grid gap-6 xl:grid-cols-2 items-start"
+                  ? "grid gap-6 lg:grid-cols-2 items-start"
                   : "grid gap-6"
               }
             >
