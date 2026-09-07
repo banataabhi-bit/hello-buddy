@@ -106,6 +106,14 @@ export const CONFIG_GAMES_REQUIRED = ethers.keccak256(
 export const RARITY_NAMES = ["Common", "Rare", "Epic", "Legend"] as const;
 export const MAX_LEVEL = 9;
 
+export function formatTierLabel(
+  nft: { rarity: number; level: number },
+  oneBased = false,
+): string {
+  if (nft.rarity === 3) return "MAX 🔥";
+  return `Tier ${oneBased ? nft.level + 1 : nft.level}`;
+}
+
 export const RARITY_CLASS: Record<number, string> = {
   0: "bg-secondary text-secondary-foreground",
   1: "bg-primary/20 text-primary",

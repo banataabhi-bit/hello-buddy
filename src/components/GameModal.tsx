@@ -9,7 +9,7 @@ import { PredictGame, isMaxTier } from "@/components/PredictGame";
 import { LoadingBlock } from "@/components/LoadingImage";
 import { useOwnedNfts } from "@/hooks/useLitdex";
 import { useWallet } from "@/hooks/useWallet";
-import { RARITY_NAMES, type OwnedNft } from "@/lib/litdex";
+import { formatTierLabel, RARITY_NAMES, type OwnedNft } from "@/lib/litdex";
 import { ChevronLeft, Gamepad2 } from "lucide-react";
 
 function ChampionRow({
