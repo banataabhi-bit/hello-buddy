@@ -54,8 +54,9 @@ export const PAY_TOKEN_ADDRESS: Record<PayToken, string> = {
 export const API_BASE = "https://litdex-nft.test-hub.xyz";
 
 /** Predictable artwork URL served by the metadata API — lets us show art without an RPC round-trip. */
-export function artworkUrl(tokenId: bigint | number | string): string {
-  return `${API_BASE}/metadata/${tokenId.toString()}/image`;
+export function artworkUrl(tokenId: bigint | number | string, version?: string): string {
+  const base = `${API_BASE}/metadata/${tokenId.toString()}/image`;
+  return version ? `${base}?v=${encodeURIComponent(version)}` : base;
 }
 
 export const USDT_ABI = [
