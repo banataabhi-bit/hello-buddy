@@ -502,10 +502,10 @@ export function MintCard() {
                   return (
                     <div
                       key={category}
-                      className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--mint-border)] bg-[var(--mint-muted)] p-4 transition-shadow duration-300 hover:shadow-sm"
+                      className="flex items-center justify-between gap-4 rounded-2xl border border-[var(--mint-border)] bg-[var(--mint-muted)] p-4 transition-shadow duration-300 hover:shadow-sm"
                     >
-                      <div>
-                        <p className="font-mono text-sm font-bold uppercase tracking-widest text-[var(--mint-text)]">
+                      <div className="min-w-0">
+                        <p className="truncate font-mono text-sm font-bold uppercase tracking-widest text-[var(--mint-text)]">
                           {category} x {vouchers.length}
                         </p>
                         <p className="mt-1 font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-primary)]">
