@@ -561,8 +561,11 @@ export function MintCard() {
                       selectedCost !== null ? formatUsdt(selectedCost) : "…"
                     } ${voucherPayToken}`}
               </button>
+                </div>
+              )}
             </div>
           )}
+
 
           {/* Not connected */}
           {!address && (

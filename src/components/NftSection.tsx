@@ -73,7 +73,7 @@ function RarityFilter({
 }
 
 export function NftSection() {
-  const { address } = useWallet();
+  const { address, correctNetwork, switchNetwork } = useWallet();
   const { data, isLoading } = useOwnedNfts();
   const [rarity, setRarity] = useState<RarityKey>("all");
   const [page, setPage] = useState(0);
@@ -115,14 +115,29 @@ export function NftSection() {
         </div>
       </div>
 
+      {!correctNetwork && (
+        <div className="rounded-[2rem] border-2 border-dashed border-black/15 bg-[#F4F4F2] p-8 text-center">
+          <p className="btn-text text-black/60">
+            You&apos;re on another network — switch to Base Sepolia to see and manage your champions.
+          </p>
+          <button
+            onClick={() => void switchNetwork()}
+            className="btn fx-9 btn-pill btn-blue mt-6"
+          >
+            <span className="btn-label">switch to base</span>
+          </button>
+        </div>
+      )}
+
       {isLoading && <LoadingBlock label="Scanning token IDs…" />}
-      {!isLoading && filtered.length === 0 && (
+      {!isLoading && filtered.length === 0 && correctNetwork && (
         <div className="btn-text rounded-[2rem] border-2 border-dashed border-black/15 bg-[#F4F4F2] p-8 text-center text-black/50">
           {data && data.length > 0
             ? "No champions match this filter."
             : "You don't own any Litdex champions yet. Mint one above."}
         </div>
       )}
+
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((nft) => (
           <NftCard key={nft.tokenId.toString()} nft={nft} compact />

@@ -12,7 +12,9 @@ import {
   useLevelCost,
   useNftArtwork,
   useRefreshAll,
+  waitForTokenStateChange,
 } from "@/hooks/useLitdex";
+
 import { useWallet } from "@/hooks/useWallet";
 import {
   MAX_LEVEL,
@@ -87,9 +89,16 @@ export function NftCard({ nft, compact = false }: { nft: OwnedNft; compact?: boo
   async function run(label: string, fn: (signer: ethers.Signer) => Promise<void>, fallback: string) {
     if (!address) return;
     setBusy(label);
+    const before = {
+      rarity: nft.rarity,
+      level: nft.level,
+      damaged: nft.damaged,
+      gamesAtMaxLevel: nft.gamesAtMaxLevel,
+    };
     try {
       const signer = await getSigner();
       await fn(signer);
+      if (label !== "Transfer") await waitForTokenStateChange(nft.tokenId, before);
       await refreshAll();
       toast.success(`${label} complete`);
     } catch (err) {
@@ -98,6 +107,7 @@ export function NftCard({ nft, compact = false }: { nft: OwnedNft; compact?: boo
       setBusy(null);
     }
   }
+
 
   const nftWith = (signer: ethers.Signer) => nftContract(signer);
 
