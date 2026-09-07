@@ -307,7 +307,7 @@ export function MintCard() {
                     price !== null
                       ? formatUsdt(price * BigInt(publicQtyClamped))
                       : "…"
-                  } $USDC`}
+                  } USDC`}
         </button>
       </div>
 
@@ -459,7 +459,7 @@ export function MintCard() {
                         <p className="mt-1 font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-primary)]">
                           {discountLabel(first.discountBps)} off
                           {price !== null
-                            ? ` · $${formatUsdt(discountedPrice(price, first.discountBps))} $USDC`
+                            ? ` · $${formatUsdt(discountedPrice(price, first.discountBps))} USDC`
                             : ""}
                         </p>
                       </div>
@@ -504,7 +504,7 @@ export function MintCard() {
                   : status ??
                     `Mint ${selectedVouchers.length} in one transaction · $${
                       selectedCost !== null ? formatUsdt(selectedCost) : "…"
-                    } $USDC`}
+                    } USDC`}
               </button>
                 </div>
               )}
@@ -629,7 +629,7 @@ export function MintCard() {
                             price !== null
                               ? formatUsdt(price * BigInt(publicQtyClamped))
                               : "…"
-                          } $USDC`}
+                          } USDC`}
                 </button>
               </div>
 
