@@ -447,12 +447,15 @@ export function MintCard() {
               {voucherData && voucherData.totalVouchers > 0 && (
                 <div className="flex flex-col gap-4 rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
-                  Whitelist eligible{" "}
-                  <span className="opacity-80">{"•"}</span>{" "}
-                  {voucherData.totalVouchers} discounted mint
-                  {voucherData.totalVouchers === 1 ? "" : "s"} available
-                </span>
+                <div>
+                  <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
+                    Whitelist eligible
+                  </span>
+                  <p className="mt-2 font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                    {voucherData.totalVouchers} discounted mint
+                    {voucherData.totalVouchers === 1 ? "" : "s"} available
+                  </p>
+                </div>
 
                 <div className="flex items-center gap-1 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
                   <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
