@@ -37,6 +37,26 @@ function formatCountdown(msLeft: number) {
   return d > 0 ? `${d}d ${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
+const mintStyle = {
+  "--mint-surface": "oklch(1 0 0)",
+  "--mint-muted": "oklch(0.97 0.005 260)",
+  "--mint-border": "oklch(0.91 0.02 260)",
+  "--mint-primary": "oklch(0.55 0.22 260)",
+  "--mint-primary-light": "oklch(0.65 0.2 260)",
+  "--mint-accent": "oklch(0.6 0.22 300)",
+  "--mint-text": "oklch(0.2 0.02 260)",
+  "--mint-text-muted": "oklch(0.55 0.04 260)",
+  "--mint-success": "oklch(0.65 0.2 150)",
+  "--mint-gradient-subtle":
+    "linear-gradient(135deg, oklch(0.65 0.2 260 / 0.10), oklch(0.6 0.22 300 / 0.06))",
+  "--mint-gradient-button":
+    "linear-gradient(135deg, oklch(0.55 0.22 260), oklch(0.5 0.22 300))",
+  "--mint-gradient-hero":
+    "linear-gradient(135deg, oklch(0.97 0.01 260), oklch(0.95 0.02 300 / 0.35))",
+  "--mint-gradient-premium":
+    "linear-gradient(135deg, oklch(0.22 0.03 260), oklch(0.45 0.18 260))",
+} as React.CSSProperties;
+
 export function MintCard() {
   const { address, getSigner, correctNetwork, connect, connecting } = useWallet();
   const { data: mintStatus, isLoading, refetch: refetchStatus } = useMintStatus();
@@ -217,236 +237,282 @@ export function MintCard() {
     }
   }
 
-
   return (
     <div
       id="mint"
-      className="grid scroll-mt-24 gap-6 rounded-[2rem] bg-[#F4F4F2] p-4 md:grid-cols-2 md:p-6"
+      style={mintStyle}
+      className="scroll-mt-24 rounded-[2.5rem] border border-[var(--mint-border)] bg-[var(--mint-gradient-hero)] p-6 shadow-2xl md:p-10"
     >
-      <div className="relative">
-        <div className="relative aspect-square w-full overflow-hidden rounded-[1.5rem] border-[3px] border-white bg-black/5 shadow-xl">
-          {PASS_CARD_IMAGES.map((pass, i) => (
-            <img
-              key={pass.label}
-              src={pass.src}
-              alt={`Litdex pass card — ${pass.label}`}
-              ref={(el) => {
-                // SSR: image may finish before hydration attaches onLoad.
-                if (el && el.complete) markPassLoaded(pass.label);
-              }}
-              onLoad={() => markPassLoaded(pass.label)}
-              onError={() => markPassLoaded(pass.label)}
-              className={`absolute inset-0 size-full object-cover transition-opacity duration-[900ms] ease-in-out ${
-                i === passIndex && passesReady ? "z-10 opacity-100" : "z-0 opacity-0"
-              }`}
-            />
-          ))}
-          {!passesReady && (
-            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-[#F4F4F2]">
-              <Spinner className="size-8 text-[#0038FF]" />
-              <p className="btn-text text-black/50">Loading pass cards…</p>
-            </div>
-          )}
-        </div>
-        <div className="mt-3 flex items-center justify-center gap-2">
-          {PASS_CARD_IMAGES.map((pass, i) => (
-            <span
-              key={pass.label}
-              className={`h-1.5 rounded-full transition-all duration-500 ${
-                i === passIndex
-                  ? "w-6 bg-[#0038FF]"
-                  : "w-1.5 bg-black/20"
-              }`}
-            />
-          ))}
-          <span className="ml-2 font-mono text-[11px] font-bold uppercase tracking-wide text-black/50">
-            {activePass?.label}
-          </span>
-        </div>
-      </div>
-
-      <div className="flex flex-col p-2 md:p-4">
-        <h3 className="btn-heading heading-ul text-black">Mint a champion</h3>
-        <p className="btn-text mt-2 text-black/50">
-          Common rarity to start · Base Sepolia
-        </p>
-
-        <div className="mt-6">
-          <div className="flex items-center justify-between">
-            <p className="btn-text text-xs font-bold text-black/60">
-              Items minted
-            </p>
-            <p className="btn-text text-xs font-bold text-black">
-              {isLoading || !mintStatus
-                ? "…"
-                : `${mintStatus.totalMinted} / ${mintStatus.supplyCap}`}
-            </p>
-          </div>
-          <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-black/10">
-            <div
-              className="h-full rounded-full bg-[#0038FF] transition-all"
-              style={{ width: `${Math.min(progress, 100)}%` }}
-            />
-          </div>
-        </div>
-
-        {address && voucherData && voucherData.totalVouchers > 0 && (
-          <div className="mt-6 rounded-[1.25rem] border-2 border-[#0038FF]/20 bg-white p-4 md:p-5">
-            <p className="inline-flex items-center gap-2 rounded-full bg-[#CCFF00] px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-wide text-black">
-              Whitelist eligible · {voucherData.totalVouchers} discounted mint
-              {voucherData.totalVouchers === 1 ? "" : "s"} available
-            </p>
-
-            <div className="mt-3 flex items-center gap-1 rounded-full bg-[#F4F4F2] p-1 self-start">
-              <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-wide text-black/50">
-                Pay with
-              </span>
-              {(["USDT", "USDC"] as const).map((token) => (
-                <button
-                  key={token}
-                  type="button"
-                  disabled={busy}
-                  onClick={() => setVoucherPayToken(token)}
-                  className={`rounded-full px-3 py-1 font-mono text-[11px] font-bold transition-colors disabled:opacity-40 ${
-                    voucherPayToken === token
-                      ? "bg-[#0038FF] text-white"
-                      : "text-black/60 hover:text-black"
-                  }`}
-                >
-                  {token}
-                </button>
-              ))}
-            </div>
-
-            {priorityVoucher && price !== null && (
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-[1rem] border-2 border-[#CCFF00] bg-black px-4 py-3">
-                <p className="btn-text text-sm font-bold uppercase text-white">
-                  You are eligible to mint at $
-                  {formatUsdt(discountedPrice(price, priorityVoucher.discountBps))}{" "}
-                  {voucherPayToken}
+      <div className="grid gap-8 lg:grid-cols-2">
+        {/* Left: pass-card carousel */}
+        <div className="relative flex flex-col gap-4">
+          <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] shadow-xl">
+            {PASS_CARD_IMAGES.map((pass, i) => (
+              <img
+                key={pass.label}
+                src={pass.src}
+                alt={`Litdex pass card — ${pass.label}`}
+                ref={(el) => {
+                  if (el && el.complete) markPassLoaded(pass.label);
+                }}
+                onLoad={() => markPassLoaded(pass.label)}
+                onError={() => markPassLoaded(pass.label)}
+                className={`absolute inset-0 size-full object-cover transition-opacity duration-[900ms] ease-in-out ${
+                  i === passIndex && passesReady ? "z-10 opacity-100" : "z-0 opacity-0"
+                }`}
+              />
+            ))}
+            {!passesReady && (
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-[var(--mint-surface)]">
+                <Spinner className="size-8 text-[var(--mint-primary)]" />
+                <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                  Loading pass cards…
                 </p>
-                <button
-                  disabled={!correctNetwork || busy}
-                  onClick={() => void handleVoucherMint([priorityVoucher])}
-                  className="btn fx-9 btn-pill btn-blue"
-                >
-                  <span className="btn-label">{status ?? "Mint"}</span>
-                </button>
               </div>
             )}
+          </div>
 
-            <div className="mt-4 flex flex-col gap-2">
-              {voucherGroups.map(([category, vouchers]) => {
-                const qty = Math.min(qtyFor(category), vouchers.length);
-                const first = vouchers[0]!;
-                return (
-                  <div
-                    key={category}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-[1rem] bg-[#F4F4F2] px-4 py-3"
-                  >
+          <div className="flex items-center justify-center gap-3">
+            {PASS_CARD_IMAGES.map((pass, i) => (
+              <button
+                key={pass.label}
+                type="button"
+                aria-label={`Show ${pass.label} pass`}
+                onClick={() => setPassIndex(i)}
+                className={`h-2 rounded-full transition-all duration-500 ${
+                  i === passIndex
+                    ? "w-8 bg-[var(--mint-primary)]"
+                    : "w-2 bg-[var(--mint-border)] hover:bg-[var(--mint-primary)]/40"
+                }`}
+              />
+            ))}
+            <span className="ml-2 rounded-full border border-[var(--mint-border)] bg-[var(--mint-surface)] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+              {activePass?.label}
+            </span>
+          </div>
+        </div>
+
+        {/* Right: mint controls */}
+        <div className="flex flex-col gap-6">
+          <div>
+            <h3 className="font-sans text-2xl font-bold tracking-tight text-[var(--mint-text)] md:text-3xl">
+              Mint a champion
+            </h3>
+            <span className="mt-3 block h-1 w-16 rounded-full bg-[var(--mint-gradient-button)]" />
+            <p className="mt-4 font-sans text-sm font-medium text-[var(--mint-text-muted)]">
+              Common rarity to start · Base Sepolia
+            </p>
+          </div>
+
+          {/* Progress */}
+          <div className="rounded-2xl border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm">
+            <div className="flex items-center justify-between">
+              <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                Items minted
+              </p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text)]">
+                {isLoading || !mintStatus
+                  ? "…"
+                  : `${mintStatus.totalMinted} / ${mintStatus.supplyCap}`}
+              </p>
+            </div>
+            <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-[var(--mint-muted)]">
+              <div
+                className="h-full rounded-full bg-[var(--mint-gradient-button)] transition-all duration-700"
+                style={{ width: `${Math.min(progress, 100)}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Whitelist */}
+          {address && voucherData && voucherData.totalVouchers > 0 && (
+            <div className="flex flex-col gap-4 rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="inline-flex items-center gap-2 rounded-full bg-[var(--mint-gradient-button)] px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
+                  Whitelist eligible{" "}
+                  <span className="opacity-80">{"•"}</span>{" "}
+                  {voucherData.totalVouchers} discounted mint
+                  {voucherData.totalVouchers === 1 ? "" : "s"} available
+                </span>
+
+                <div className="flex items-center gap-1 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
+                  <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                    Pay with
+                  </span>
+                  {(["USDT", "USDC"] as const).map((token) => (
+                    <button
+                      key={token}
+                      type="button"
+                      disabled={busy}
+                      onClick={() => setVoucherPayToken(token)}
+                      className={`rounded-full px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40 ${
+                        voucherPayToken === token
+                          ? "bg-[var(--mint-gradient-button)] text-white shadow-md"
+                          : "text-[var(--mint-text-muted)] hover:text-[var(--mint-primary)]"
+                      }`}
+                    >
+                      {token}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Priority voucher */}
+              {priorityVoucher && price !== null && (
+                <div className="relative overflow-hidden rounded-2xl bg-[var(--mint-gradient-premium)] p-5 text-white shadow-md">
+                  <div className="absolute -right-8 -top-8 size-32 rounded-full bg-[var(--mint-primary)]/20 blur-2xl" />
+                  <div className="relative flex flex-wrap items-center justify-between gap-4">
                     <div>
-                      <p className="btn-text text-sm font-bold uppercase text-black">
-                        {category} x {vouchers.length}
+                      <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-white/70">
+                        Exclusive access
                       </p>
-                      <p className="mt-0.5 font-mono text-[11px] font-bold uppercase tracking-wide text-[#0038FF]">
-                        {discountLabel(first.discountBps)} off
-                        {price !== null
-                          ? ` · $${formatUsdt(discountedPrice(price, first.discountBps))} ${voucherPayToken}`
-                          : ""}
+                      <p className="mt-1 font-sans text-base font-semibold">
+                        You are eligible to mint at ${" "}
+                        {formatUsdt(discountedPrice(price, priorityVoucher.discountBps))}{" "}
+                        {voucherPayToken}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-2 rounded-full bg-white px-2 py-1">
+                    <button
+                      disabled={!correctNetwork || busy}
+                      onClick={() => void handleVoucherMint([priorityVoucher])}
+                      className="rounded-full bg-white px-6 py-2.5 font-mono text-[12px] font-bold uppercase tracking-widest text-[var(--mint-text)] shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
+                    >
+                      {status ?? "Mint"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Category rows */}
+              <div className="flex flex-col gap-3">
+                {voucherGroups.map(([category, vouchers]) => {
+                  const qty = Math.min(qtyFor(category), vouchers.length);
+                  const first = vouchers[0]!;
+                  return (
+                    <div
+                      key={category}
+                      className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--mint-border)] bg-[var(--mint-muted)] p-4 transition-shadow duration-300 hover:shadow-sm"
+                    >
+                      <div>
+                        <p className="font-mono text-sm font-bold uppercase tracking-widest text-[var(--mint-text)]">
+                          {category} x {vouchers.length}
+                        </p>
+                        <p className="mt-1 font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-primary)]">
+                          {discountLabel(first.discountBps)} off
+                          {price !== null
+                            ? ` · $${formatUsdt(discountedPrice(price, first.discountBps))} ${voucherPayToken}`
+                            : ""}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 rounded-full border border-[var(--mint-border)] bg-[var(--mint-surface)] p-1">
                         <button
                           aria-label={`Decrease ${category} quantity`}
                           disabled={qty <= 0 || busy}
                           onClick={() => setQty(category, qty - 1, vouchers.length)}
-                          className="grid size-7 place-items-center rounded-full bg-black/5 text-black disabled:opacity-40"
+                          className="grid size-8 place-items-center rounded-full text-[var(--mint-text)] transition-all hover:bg-[var(--mint-muted)] hover:text-[var(--mint-primary)] active:scale-90 disabled:opacity-40"
                         >
                           <Minus className="size-3.5" />
                         </button>
-                        <span className="min-w-5 text-center font-mono text-sm font-bold text-black">
+                        <span className="min-w-6 text-center font-mono text-sm font-bold text-[var(--mint-text)]">
                           {qty}
                         </span>
                         <button
                           aria-label={`Increase ${category} quantity`}
                           disabled={qty >= vouchers.length || busy}
                           onClick={() => setQty(category, qty + 1, vouchers.length)}
-                          className="grid size-7 place-items-center rounded-full bg-black/5 text-black disabled:opacity-40"
+                          className="grid size-8 place-items-center rounded-full text-[var(--mint-text)] transition-all hover:bg-[var(--mint-muted)] hover:text-[var(--mint-primary)] active:scale-90 disabled:opacity-40"
                         >
                           <Plus className="size-3.5" />
                         </button>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
 
-            <button
-              disabled={
-                !correctNetwork ||
-                busy ||
-                price === null ||
-                selectedVouchers.length === 0
-              }
-              onClick={() => void handleVoucherMint(selectedVouchers)}
-              className="btn fx-9 btn-pill btn-blue mt-4 w-full"
-            >
-              <span className="btn-label">
+              <button
+                disabled={
+                  !correctNetwork ||
+                  busy ||
+                  price === null ||
+                  selectedVouchers.length === 0
+                }
+                onClick={() => void handleVoucherMint(selectedVouchers)}
+                className="mt-1 w-full rounded-full bg-[var(--mint-gradient-button)] px-6 py-3.5 font-mono text-[13px] font-bold uppercase tracking-widest text-white shadow-lg shadow-[var(--mint-primary)]/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--mint-primary)]/25 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
+              >
                 {selectedVouchers.length === 0
                   ? "Select vouchers to mint"
-                    : (status ??
+                  : status ??
                     `Mint ${selectedVouchers.length} in one transaction · $${
                       selectedCost !== null ? formatUsdt(selectedCost) : "…"
-                    } ${voucherPayToken}`)}
-              </span>
-            </button>
-          </div>
-        )}
-
-
-        {!address && (
-          <div className="mt-6 flex flex-col gap-3">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] bg-white p-4 md:p-5">
-              <p className="btn-text font-bold text-black">Whitelist mint</p>
-              <p className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-[#0038FF]">
-                <span className="inline-block size-2 rounded-full bg-[#CCFF00] ring-2 ring-[#0038FF]/30" />
-                Open
-              </p>
+                    } ${voucherPayToken}`}
+              </button>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] bg-white p-4 md:p-5">
-              <p className="btn-text font-bold text-black">Public mint</p>
-              <p className="font-mono text-[11px] font-bold uppercase text-black/60">
-                {started
-                  ? "Live now"
-                  : countdown
-                    ? `Starts in ${countdown}`
-                    : "Not scheduled"}
-              </p>
-            </div>
-            <button
-              onClick={() => void connect()}
-              disabled={connecting}
-              className="btn fx-9 btn-pill btn-blue w-full"
-            >
-              <span className="btn-label">
+          )}
+
+          {/* Not connected */}
+          {!address && (
+            <div className="flex flex-col gap-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-2xl border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm transition-shadow duration-300 hover:shadow-md">
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                    Whitelist mint
+                  </p>
+                  <p className="mt-2 flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-widest text-[var(--mint-primary)]">
+                    <span className="inline-block size-2 rounded-full bg-[var(--mint-success)]" />
+                    Open
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm transition-shadow duration-300 hover:shadow-md">
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                    Public mint
+                  </p>
+                  <p className="mt-2 font-mono text-[12px] font-bold uppercase tracking-widest text-[var(--mint-text)]">
+                    {started
+                      ? "Live now"
+                      : countdown
+                        ? `Starts in ${countdown}`
+                        : "Not scheduled"}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => void connect()}
+                disabled={connecting}
+                className="w-full rounded-full bg-[var(--mint-gradient-button)] px-6 py-3.5 font-mono text-[13px] font-bold uppercase tracking-widest text-white shadow-lg shadow-[var(--mint-primary)]/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--mint-primary)]/25 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
+              >
                 {connecting ? "Connecting…" : "Connect wallet to mint"}
-              </span>
-            </button>
-          </div>
-        )}
+              </button>
+            </div>
+          )}
 
-        {address && (
-          <div className="mt-6 rounded-[1.25rem] bg-white p-4 md:p-5">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <p className="btn-text font-bold text-black">Public stage</p>
-                <p className="mt-1 font-mono text-sm font-bold text-black">
-                  ${price !== null ? formatUsdt(price) : "…"} {payToken}
-                </p>
-                <div className="mt-2 flex items-center gap-1 rounded-full bg-[#F4F4F2] p-1">
-                  <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-wide text-black/50">
+          {/* Public stage */}
+          {address && (
+            <div className="rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                    Public stage
+                  </p>
+                  <p className="font-sans text-2xl font-bold text-[var(--mint-text)]">
+                    ${price !== null ? formatUsdt(price) : "…"} {payToken}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] px-3 py-1.5">
+                  <span
+                    className={`size-2 rounded-full ${
+                      started ? "bg-[var(--mint-primary)]" : "bg-[var(--mint-success)]"
+                    }`}
+                  />
+                  <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text)]">
+                    {started ? "Minting now" : "Not started"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-1 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
+                  <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
                     Pay with
                   </span>
                   {(["USDT", "USDC"] as const).map((token) => (
@@ -455,43 +521,49 @@ export function MintCard() {
                       type="button"
                       disabled={busy}
                       onClick={() => setPayToken(token)}
-                      className={`rounded-full px-3 py-1 font-mono text-[11px] font-bold transition-colors disabled:opacity-40 ${
+                      className={`rounded-full px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40 ${
                         payToken === token
-                          ? "bg-[#0038FF] text-white"
-                          : "text-black/60 hover:text-black"
+                          ? "bg-[var(--mint-gradient-button)] text-white shadow-md"
+                          : "text-[var(--mint-text-muted)] hover:text-[var(--mint-primary)]"
                       }`}
                     >
                       {token}
                     </button>
                   ))}
                 </div>
-                <p className="mt-1 flex items-center gap-1.5 font-mono text-[11px] font-bold text-[#0038FF]">
-                  <span className="inline-block size-2 rounded-full bg-[#CCFF00] ring-2 ring-[#0038FF]/30" />
-                  {started ? "MINTING NOW" : "NOT STARTED"}
+
+                <p className="font-mono text-[12px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                  {started
+                    ? "Minting now"
+                    : countdown
+                      ? `Starts in ${countdown}`
+                      : "Not scheduled"}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 rounded-full bg-[#F4F4F2] px-2 py-1">
+
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-2 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
                   <button
                     aria-label="Decrease public mint quantity"
                     disabled={publicQtyClamped <= 1 || busy}
                     onClick={() => setPublicQty(publicQtyClamped - 1)}
-                    className="grid size-7 place-items-center rounded-full bg-black/5 text-black disabled:opacity-40"
+                    className="grid size-8 place-items-center rounded-full text-[var(--mint-text)] transition-all hover:bg-[var(--mint-surface)] hover:text-[var(--mint-primary)] active:scale-90 disabled:opacity-40"
                   >
                     <Minus className="size-3.5" />
                   </button>
-                  <span className="min-w-5 text-center font-mono text-sm font-bold text-black">
+                  <span className="min-w-6 text-center font-mono text-sm font-bold text-[var(--mint-text)]">
                     {publicQtyClamped}
                   </span>
                   <button
                     aria-label="Increase public mint quantity"
                     disabled={publicQtyClamped >= remainingPublic || busy}
                     onClick={() => setPublicQty(publicQtyClamped + 1)}
-                    className="grid size-7 place-items-center rounded-full bg-black/5 text-black disabled:opacity-40"
+                    className="grid size-8 place-items-center rounded-full text-[var(--mint-text)] transition-all hover:bg-[var(--mint-surface)] hover:text-[var(--mint-primary)] active:scale-90 disabled:opacity-40"
                   >
                     <Plus className="size-3.5" />
                   </button>
                 </div>
+
                 <button
                   disabled={
                     !correctNetwork ||
@@ -502,42 +574,38 @@ export function MintCard() {
                     limitReached
                   }
                   onClick={() => void handleMint(publicQtyClamped)}
-                  className="btn fx-9 btn-pill btn-blue"
+                  className="rounded-full bg-[var(--mint-gradient-button)] px-8 py-3.5 font-mono text-[13px] font-bold uppercase tracking-widest text-white shadow-lg shadow-[var(--mint-primary)]/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--mint-primary)]/25 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
                 >
-                  <span className="btn-label">
-                    {soldOut
-                      ? "Sold out"
-                      : !started
-                        ? countdown
-                          ? `Starts in ${countdown}`
-                          : "Not started"
-                        : limitReached
-                          ? "Limit reached"
-                          : (status ??
-                            `Mint ${publicQtyClamped} · $${
-                              price !== null
-                                ? formatUsdt(price * BigInt(publicQtyClamped))
-                                : "…"
-                            } ${payToken}`)}
-                  </span>
+                  {soldOut
+                    ? "Sold out"
+                    : !started
+                      ? "Mint when live"
+                      : limitReached
+                        ? "Limit reached"
+                        : status ??
+                          `Mint ${publicQtyClamped} · $${
+                            price !== null
+                              ? formatUsdt(price * BigInt(publicQtyClamped))
+                              : "…"
+                          } ${payToken}`}
                 </button>
               </div>
+
+              <p className="mt-5 text-right font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                Limit {WALLET_LIMIT} per wallet · You own {ownedCount}
+              </p>
             </div>
-            <p className="mt-3 text-right font-mono text-[11px] font-bold tracking-wide text-black/40">
-              LIMIT {WALLET_LIMIT} PER WALLET · YOU OWN {ownedCount}
+          )}
+
+          {mintedId !== null && (
+            <p className="font-mono text-xs font-bold text-[var(--mint-text-muted)]">
+              {mintedArtLoading
+                ? "Loading artwork…"
+                : `Champion #${mintedId.toString()} minted!`}
             </p>
-          </div>
-        )}
-
-        {mintedId !== null && (
-          <p className="mt-4 font-mono text-xs font-bold text-black/60">
-            {mintedArtLoading
-              ? "Loading artwork…"
-              : `Champion #${mintedId.toString()} minted!`}
-          </p>
-        )}
+          )}
+        </div>
       </div>
-
     </div>
   );
 }
