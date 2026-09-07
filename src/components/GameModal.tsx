@@ -27,7 +27,7 @@ function ChampionRow({
       <div className="space-y-1">
         <p className="btn-text text-black">Champion #{nft.tokenId.toString().padStart(4, "0")}</p>
         <p className="btn-text text-black/60">
-          {RARITY_NAMES[nft.rarity]} · Tier {nft.level + 1}
+          {RARITY_NAMES[nft.rarity]} · {formatTierLabel(nft, true)}
         </p>
       </div>
       <span className="btn fx-9 btn-pill btn-lime shrink-0">
@@ -107,7 +107,7 @@ export function GameModal({ open, onOpenChange }: { open: boolean; onOpenChange:
               <div className="rounded-[2rem] border-2 border-black/10 bg-[#F4F4F2] p-6">
                 <p className="btn-text mb-4 text-black">
                   Playing with Champion #{selected.tokenId.toString().padStart(4, "0")} ·{" "}
-                  {RARITY_NAMES[selected.rarity]} · Tier {selected.level + 1}
+                  {RARITY_NAMES[selected.rarity]} · {formatTierLabel(selected, true)}
                 </p>
                 <PredictGame nft={selected} />
               </div>
