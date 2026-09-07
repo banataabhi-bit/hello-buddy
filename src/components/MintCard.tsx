@@ -241,7 +241,7 @@ export function MintCard() {
     <div
       id="mint"
       style={mintStyle}
-      className="scroll-mt-24 rounded-[2.5rem] border border-[var(--mint-border)] bg-[var(--mint-gradient-hero)] p-6 shadow-2xl md:p-10"
+      className="scroll-mt-24 rounded-[2.5rem] border border-[var(--mint-border)] bg-gradient-to-br from-slate-50 via-white to-indigo-50 p-6 shadow-2xl md:p-10"
     >
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Left: pass-card carousel */}
@@ -298,7 +298,7 @@ export function MintCard() {
             <h3 className="font-sans text-2xl font-bold tracking-tight text-[var(--mint-text)] md:text-3xl">
               Mint a champion
             </h3>
-            <span className="mt-3 block h-1 w-16 rounded-full bg-[var(--mint-gradient-button)]" />
+            <span className="mt-3 block h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-violet-600" />
             <p className="mt-4 font-sans text-sm font-medium text-[var(--mint-text-muted)]">
               Common rarity to start · Base Sepolia
             </p>
@@ -318,7 +318,7 @@ export function MintCard() {
             </div>
             <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-[var(--mint-muted)]">
               <div
-                className="h-full rounded-full bg-[var(--mint-gradient-button)] transition-all duration-700"
+                className="h-full rounded-full bg-gradient-to-r from-blue-600 to-violet-600 transition-all duration-700"
                 style={{ width: `${Math.min(progress, 100)}%` }}
               />
             </div>
@@ -328,7 +328,7 @@ export function MintCard() {
           {address && voucherData && voucherData.totalVouchers > 0 && (
             <div className="flex flex-col gap-4 rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="inline-flex items-center gap-2 rounded-full bg-[var(--mint-gradient-button)] px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
+                <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
                   Whitelist eligible{" "}
                   <span className="opacity-80">{"•"}</span>{" "}
                   {voucherData.totalVouchers} discounted mint
@@ -347,7 +347,7 @@ export function MintCard() {
                       onClick={() => setVoucherPayToken(token)}
                       className={`rounded-full px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40 ${
                         voucherPayToken === token
-                          ? "bg-[var(--mint-gradient-button)] text-white shadow-md"
+                          ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-md"
                           : "text-[var(--mint-text-muted)] hover:text-[var(--mint-primary)]"
                       }`}
                     >
@@ -359,7 +359,7 @@ export function MintCard() {
 
               {/* Priority voucher */}
               {priorityVoucher && price !== null && (
-                <div className="relative overflow-hidden rounded-2xl bg-[var(--mint-gradient-premium)] p-5 text-white shadow-md">
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-blue-900 p-5 text-white shadow-md">
                   <div className="absolute -right-8 -top-8 size-32 rounded-full bg-[var(--mint-primary)]/20 blur-2xl" />
                   <div className="relative flex flex-wrap items-center justify-between gap-4">
                     <div>
@@ -438,7 +438,7 @@ export function MintCard() {
                   selectedVouchers.length === 0
                 }
                 onClick={() => void handleVoucherMint(selectedVouchers)}
-                className="mt-1 w-full rounded-full bg-[var(--mint-gradient-button)] px-6 py-3.5 font-mono text-[13px] font-bold uppercase tracking-widest text-white shadow-lg shadow-[var(--mint-primary)]/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--mint-primary)]/25 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
+                className="mt-1 w-full rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-3.5 font-mono text-[13px] font-bold uppercase tracking-widest text-white shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/25 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
               >
                 {selectedVouchers.length === 0
                   ? "Select vouchers to mint"
@@ -479,7 +479,7 @@ export function MintCard() {
               <button
                 onClick={() => void connect()}
                 disabled={connecting}
-                className="w-full rounded-full bg-[var(--mint-gradient-button)] px-6 py-3.5 font-mono text-[13px] font-bold uppercase tracking-widest text-white shadow-lg shadow-[var(--mint-primary)]/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--mint-primary)]/25 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
+                className="w-full rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-3.5 font-mono text-[13px] font-bold uppercase tracking-widest text-white shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/25 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
               >
                 {connecting ? "Connecting…" : "Connect wallet to mint"}
               </button>
@@ -523,7 +523,7 @@ export function MintCard() {
                       onClick={() => setPayToken(token)}
                       className={`rounded-full px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40 ${
                         payToken === token
-                          ? "bg-[var(--mint-gradient-button)] text-white shadow-md"
+                          ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-md"
                           : "text-[var(--mint-text-muted)] hover:text-[var(--mint-primary)]"
                       }`}
                     >
@@ -574,7 +574,7 @@ export function MintCard() {
                     limitReached
                   }
                   onClick={() => void handleMint(publicQtyClamped)}
-                  className="rounded-full bg-[var(--mint-gradient-button)] px-8 py-3.5 font-mono text-[13px] font-bold uppercase tracking-widest text-white shadow-lg shadow-[var(--mint-primary)]/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--mint-primary)]/25 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
+                  className="rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-8 py-3.5 font-mono text-[13px] font-bold uppercase tracking-widest text-white shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/25 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
                 >
                   {soldOut
                     ? "Sold out"
