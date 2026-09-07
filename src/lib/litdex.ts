@@ -271,9 +271,8 @@ export function nftContract(runner: ethers.ContractRunner): NftContract {
 export function pointsContract(runner: ethers.ContractRunner): PointsContract {
   return new ethers.Contract(POINTS_ADDRESS, POINTS_ABI, runner) as unknown as PointsContract;
 }
-export function usdtContract(runner: ethers.ContractRunner): UsdtContract {
-  return new ethers.Contract(USDT_ADDRESS, USDT_ABI, runner) as unknown as UsdtContract;
+export function usdcContract(runner: ethers.ContractRunner): UsdtContract {
+  return new ethers.Contract(USDC_ADDRESS, USDC_ABI, runner) as unknown as UsdtContract;
 }
-export function payTokenContract(token: PayToken, runner: ethers.ContractRunner): UsdtContract {
-  return new ethers.Contract(PAY_TOKEN_ADDRESS[token], USDT_ABI, runner) as unknown as UsdtContract;
-}
+export const usdtContract = usdcContract;
+
