@@ -362,16 +362,11 @@ export function MintCard() {
                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-blue-900 p-5 text-white shadow-md">
                   <div className="absolute -right-8 -top-8 size-32 rounded-full bg-[var(--mint-primary)]/20 blur-2xl" />
                   <div className="relative flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                      <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-white/70">
-                        Exclusive access
-                      </p>
-                      <p className="mt-1 font-sans text-base font-semibold">
-                        You are eligible to mint at ${" "}
-                        {formatUsdt(discountedPrice(price, priorityVoucher.discountBps))}{" "}
-                        {voucherPayToken}
-                      </p>
-                    </div>
+                    <p className="font-sans text-base font-semibold">
+                      You are eligible to mint at ${" "}
+                      {formatUsdt(discountedPrice(price, priorityVoucher.discountBps))}{" "}
+                      {voucherPayToken}
+                    </p>
                     <button
                       disabled={!correctNetwork || busy}
                       onClick={() => void handleVoucherMint([priorityVoucher])}
