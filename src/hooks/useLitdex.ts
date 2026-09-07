@@ -204,13 +204,13 @@ export function useLevelCost(level: number) {
  * the on-chain tokenURI is resolved in the background and only swaps the
  * source if it points somewhere else.
  */
-export function useNftArtwork(tokenId: bigint | undefined) {
+export function useNftArtwork(tokenId: bigint | undefined, version?: string) {
   return useQuery({
-    queryKey: ["nftArtwork", tokenId?.toString()],
+    queryKey: ["nftArtwork", tokenId?.toString(), version ?? ""],
     enabled: tokenId !== undefined,
     retry: false,
     staleTime: Infinity,
-    placeholderData: tokenId !== undefined ? artworkUrl(tokenId) : null,
+    placeholderData: tokenId !== undefined ? artworkUrl(tokenId, version) : null,
     queryFn: async (): Promise<string | null> => {
       const uri = await nftRead().tokenURI(tokenId!);
       const httpUri = uri.startsWith("ipfs://")
@@ -222,14 +222,18 @@ export function useNftArtwork(tokenId: bigint | undefined) {
         image = json.image ?? null;
       } else {
         const res = await fetch(httpUri);
-        if (!res.ok) return artworkUrl(tokenId!);
+        if (!res.ok) return artworkUrl(tokenId!, version);
         const json = await res.json();
         image = json.image ?? null;
       }
       if (image && image.startsWith("ipfs://")) {
         image = image.replace("ipfs://", "https://ipfs.io/ipfs/");
       }
-      return image ?? artworkUrl(tokenId!);
+      if (!image) return artworkUrl(tokenId!, version);
+      if (version && image.startsWith(API_BASE)) {
+        image += `${image.includes("?") ? "&" : "?"}v=${encodeURIComponent(version)}`;
+      }
+      return image;
     },
   });
 }
