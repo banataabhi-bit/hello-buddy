@@ -1,4 +1,6 @@
 import { motion } from "motion/react";
+import { useState } from "react";
+import { GameModal } from "@/components/GameModal";
 import { HERO_EPIC_IMAGE, HERO_LEGEND_IMAGE } from "@/lib/images";
 import { useWallet } from "@/hooks/useWallet";
 import { truncateAddress } from "@/lib/litdex";
