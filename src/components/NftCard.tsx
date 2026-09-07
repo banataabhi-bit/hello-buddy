@@ -98,7 +98,7 @@ export function NftCard({ nft, compact = false }: { nft: OwnedNft; compact?: boo
     try {
       const signer = await getSigner();
       await fn(signer);
-      await waitForTokenStateChange(nft.tokenId, before);
+      if (label !== "Transfer") await waitForTokenStateChange(nft.tokenId, before);
       await refreshAll();
       toast.success(`${label} complete`);
     } catch (err) {
