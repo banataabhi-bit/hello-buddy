@@ -1,4 +1,3 @@
-import { ethers } from "ethers";
 import { Check, ChevronDown, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -9,6 +8,7 @@ import {
   nftContract,
   parseWalletError,
   type GameCompleteResponse,
+  type GameRoundResult,
   type GameStartResponse,
   type OwnedNft,
 } from "@/lib/litdex";
@@ -211,7 +211,7 @@ export function PredictGame({ nft }: { nft: OwnedNft }) {
           </div>
 
           <div className="grid grid-cols-5 gap-2">
-            {result.results.map((r) => (
+            {result.results.map((r: GameRoundResult) => (
               <div
                 key={r.round}
                 className="rounded-2xl border border-black/10 bg-white p-2 text-center"
@@ -279,5 +279,3 @@ export function isMaxTier(nft: { rarity: number; level: number }) {
   const cap = caps[nft.rarity];
   return cap !== undefined && nft.level >= cap;
 }
-
-export type { ethers };
