@@ -83,6 +83,7 @@ export const NFT_ABI = [
   "function levelUp(uint256 tokenId) external",
   "function promote(uint256 tokenId) external",
   "function repair(uint256 tokenId) external",
+  "function playPredictGame((uint256 tokenId,bool won,bytes32 nonce,uint256 expiry) result, bytes signature) external",
   "function ownerOf(uint256 tokenId) view returns (address)",
   "function balanceOf(address owner) view returns (uint256)",
   "function tokenState(uint256 tokenId) view returns (uint8 rarity, uint8 level, bool damaged, uint32 gamesAtMaxLevel)",
@@ -165,6 +166,37 @@ export function discountedPrice(price: bigint, discountBps: number) {
   return (price * BigInt(10000 - discountBps)) / 10000n;
 }
 
+export type GameStartResponse = {
+  sessionId: string;
+  tokenId: string | number;
+  livesRemaining: number;
+  targetRound: number;
+  targetTimeMs: number;
+};
+
+export type GameRoundResult = {
+  round: number;
+  guess: number;
+  correctNumber: number;
+  correct: boolean;
+};
+
+export type GameCompleteResponse = {
+  isComplete: true;
+  correctCount: number;
+  won: boolean;
+  results: GameRoundResult[];
+  gameResult: { tokenId: string | number; won: boolean; nonce: string; expiry: string | number };
+  signature: string;
+  verify: {
+    drandRound: number | string;
+    drandRandomness: string;
+    drandSignature: string;
+    drandVerifyUrl: string;
+    note: string;
+  };
+};
+
 export type OwnedNft = {
   tokenId: bigint;
   rarity: number;
@@ -199,6 +231,10 @@ export interface NftContract extends ethers.BaseContract {
   levelUp(tokenId: bigint): Promise<Tx>;
   promote(tokenId: bigint): Promise<Tx>;
   repair(tokenId: bigint): Promise<Tx>;
+  playPredictGame(
+    result: [bigint, boolean, string, bigint],
+    signature: string,
+  ): Promise<Tx>;
   transferFrom(from: string, to: string, tokenId: bigint): Promise<Tx>;
   ownerOf(tokenId: bigint): Promise<string>;
   balanceOf(owner: string): Promise<bigint>;

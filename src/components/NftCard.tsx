@@ -3,6 +3,7 @@ import { ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { LoadingImage } from "@/components/LoadingImage";
+import { PredictGame, isMaxTier } from "@/components/PredictGame";
 import { Spinner } from "@/components/ui/reui-spinner";
 import { COMMON_PFP, EPIC_PFP, LEGEND_PFP, PASS_CARD_IMAGES, RARE_PFP } from "@/lib/images";
 import {
@@ -262,6 +263,8 @@ export function NftCard({ nft, compact = false }: { nft: OwnedNft; compact?: boo
         )}
       </div>
       )}
+
+      {!compact && isMaxTier(nft) && <PredictGame nft={nft} />}
 
       {!compact && (
       <div className="space-y-2 border-t border-black/10 pt-4">
