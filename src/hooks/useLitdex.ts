@@ -248,5 +248,35 @@ export function useRefreshAll() {
   const qc = useQueryClient();
   return useCallback(async () => {
     await qc.invalidateQueries();
+    // Force every mounted query to re-read so on-screen numbers update
+    // immediately after a transaction, without a page refresh.
+    await qc.refetchQueries({ type: "active" });
   }, [qc]);
 }
+
+/**
+ * Polls the chain until a token's on-chain state differs from the snapshot we
+ * had before the transaction. Prevents the UI from re-reading a stale block.
+ */
+export async function waitForTokenStateChange(
+  tokenId: bigint,
+  previous: { rarity: number; level: number; damaged: boolean; gamesAtMaxLevel: number },
+  attempts = 10,
+) {
+  const c = nftRead();
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const s = await c.tokenState(tokenId);
+      const changed =
+        Number(s[0]) !== previous.rarity ||
+        Number(s[1]) !== previous.level ||
+        Boolean(s[2]) !== previous.damaged ||
+        Number(s[3]) !== previous.gamesAtMaxLevel;
+      if (changed) return;
+    } catch {
+      /* retry */
+    }
+    await new Promise((r) => setTimeout(r, 1200));
+  }
+}
+
