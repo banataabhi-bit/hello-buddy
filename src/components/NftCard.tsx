@@ -22,6 +22,7 @@ import {
   NFT_ADDRESS,
   RARITY_NAMES,
   formatPoints,
+  formatTierLabel,
   formatUsdt,
   nftContract,
   openSeaUrl,
