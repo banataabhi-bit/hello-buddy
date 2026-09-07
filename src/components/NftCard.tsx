@@ -22,6 +22,7 @@ import {
   NFT_ADDRESS,
   RARITY_NAMES,
   formatPoints,
+  formatTierLabel,
   formatUsdt,
   nftContract,
   openSeaUrl,
@@ -196,7 +197,7 @@ export function NftCard({ nft, compact = false }: { nft: OwnedNft; compact?: boo
           />
           <div>
             <p className="btn-text text-black/50">#{nft.tokenId.toString().padStart(4, "0")}</p>
-            <p className="btn-text text-black">TIER {nft.level}</p>
+            <p className="btn-text text-black">{formatTierLabel(nft).toUpperCase()}</p>
           </div>
 
         </div>
