@@ -14,13 +14,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Connect your wallet on Base Sepolia to claim LitVM points, mint a Litdex champion, and level it up to Legend.",
+          "Connect your wallet on Base Mainnet to claim LitVM points, mint a Litdex champion, and level it up to Legend.",
       },
       { property: "og:title", content: "Litdex Champions" },
       {
         property: "og:description",
         content:
-          "Claim LitVM points on Base Sepolia, mint Litdex champions, and level up, repair, promote and transfer them.",
+          "Claim LitVM points on Base Mainnet, mint Litdex champions, and level up, repair, promote and transfer them.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

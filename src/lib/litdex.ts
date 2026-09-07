@@ -9,14 +9,17 @@ export type ChainConfig = {
   blockExplorerUrls: string[];
 };
 
-export const BASE_SEPOLIA: ChainConfig = {
-  chainId: 84532,
-  chainIdHex: "0x14a34",
-  chainName: "Base Sepolia",
-  rpcUrls: ["https://sepolia.base.org"],
-  nativeCurrency: { name: "Sepolia Ether", symbol: "ETH", decimals: 18 },
-  blockExplorerUrls: ["https://sepolia.basescan.org"],
+export const BASE_MAINNET: ChainConfig = {
+  chainId: 8453,
+  chainIdHex: "0x2105",
+  chainName: "Base Mainnet",
+  rpcUrls: ["https://mainnet.base.org"],
+  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+  blockExplorerUrls: ["https://basescan.org"],
 };
+
+/** Back-compat alias — now points at Base Mainnet. */
+export const BASE_SEPOLIA = BASE_MAINNET;
 
 export const LITVM: ChainConfig = {
   chainId: 4441,
@@ -27,29 +30,22 @@ export const LITVM: ChainConfig = {
   blockExplorerUrls: ["https://liteforge.explorer.caldera.xyz"],
 };
 
-export const KNOWN_CHAINS: ChainConfig[] = [BASE_SEPOLIA, LITVM];
+export const KNOWN_CHAINS: ChainConfig[] = [BASE_MAINNET, LITVM];
 
 export function chainName(chainId: number | null): string {
   if (chainId === null) return "Unknown";
   return KNOWN_CHAINS.find((c) => c.chainId === chainId)?.chainName ?? `Chain ${chainId}`;
 }
 
-export const BASE_CHAIN_ID = BASE_SEPOLIA.chainId;
-export const BASE_CHAIN_HEX = BASE_SEPOLIA.chainIdHex;
-export const BASE_RPC_URL = BASE_SEPOLIA.rpcUrls[0]!;
-export const BASE_SEPOLIA_CHAIN_ID = BASE_CHAIN_ID;
-export const BASE_SEPOLIA_HEX = BASE_CHAIN_HEX;
+export const BASE_CHAIN_ID = BASE_MAINNET.chainId;
+export const BASE_CHAIN_HEX = BASE_MAINNET.chainIdHex;
+export const BASE_RPC_URL = BASE_MAINNET.rpcUrls[0]!;
 
-export const USDT_ADDRESS = "0x02b8b8090dFFb61dE134A9e639577E9c153Ac871";
-export const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
-export const POINTS_ADDRESS = "0x904b369740813dc56dE2fc457F60F832354427e0";
-export const NFT_ADDRESS = "0xd7E5A73D66D202CD211290536eab5096E8a5114F";
-
-export type PayToken = "USDT" | "USDC";
-export const PAY_TOKEN_ADDRESS: Record<PayToken, string> = {
-  USDT: USDT_ADDRESS,
-  USDC: USDC_ADDRESS,
-};
+/** Real Base Mainnet USDC — the single payment token. */
+export const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+export const USDT_ADDRESS = USDC_ADDRESS;
+export const POINTS_ADDRESS = "0xDa73c4c7fcA2E688A77b04137d56740085c2B8E7";
+export const NFT_ADDRESS = "0xaCA7EFFcd0c4689D131C8d18C09ea1994F2A5d4d";
 
 export const API_BASE = "https://litdex-nft.test-hub.xyz";
 
@@ -59,11 +55,14 @@ export function artworkUrl(tokenId: bigint | number | string, version?: string):
   return version ? `${base}?v=${encodeURIComponent(version)}` : base;
 }
 
-export const USDT_ABI = [
+
+export const USDC_ABI = [
   "function approve(address spender, uint256 amount) returns (bool)",
   "function balanceOf(address) view returns (uint256)",
   "function allowance(address owner, address spender) view returns (uint256)",
 ];
+
+export const USDT_ABI = USDC_ABI;
 
 export const POINTS_ABI = [
   "function balance(address) view returns (uint256)",
@@ -138,7 +137,7 @@ export function formatPoints(value: bigint | string) {
 }
 
 export function openSeaUrl(tokenId: string | bigint) {
-  return `https://testnets.opensea.io/assets/base-sepolia/${NFT_ADDRESS}/${tokenId.toString()}`;
+  return `https://opensea.io/assets/base/${NFT_ADDRESS}/${tokenId.toString()}`;
 }
 
 export function parseWalletError(err: unknown, fallback: string) {
@@ -274,9 +273,8 @@ export function nftContract(runner: ethers.ContractRunner): NftContract {
 export function pointsContract(runner: ethers.ContractRunner): PointsContract {
   return new ethers.Contract(POINTS_ADDRESS, POINTS_ABI, runner) as unknown as PointsContract;
 }
-export function usdtContract(runner: ethers.ContractRunner): UsdtContract {
-  return new ethers.Contract(USDT_ADDRESS, USDT_ABI, runner) as unknown as UsdtContract;
+export function usdcContract(runner: ethers.ContractRunner): UsdtContract {
+  return new ethers.Contract(USDC_ADDRESS, USDC_ABI, runner) as unknown as UsdtContract;
 }
-export function payTokenContract(token: PayToken, runner: ethers.ContractRunner): UsdtContract {
-  return new ethers.Contract(PAY_TOKEN_ADDRESS[token], USDT_ABI, runner) as unknown as UsdtContract;
-}
+export const usdtContract = usdcContract;
+

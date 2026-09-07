@@ -22,7 +22,7 @@ export function Header() {
           <NetworkSwitcher />
           {address && !correctNetwork && (
             <span className="flex items-center gap-1 text-xs font-semibold text-destructive">
-              <AlertTriangle className="size-3.5" /> On-chain actions need Base Sepolia
+              <AlertTriangle className="size-3.5" /> On-chain actions need Base Mainnet
             </span>
           )}
           {address ? (

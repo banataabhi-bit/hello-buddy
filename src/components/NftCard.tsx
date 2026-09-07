@@ -259,7 +259,7 @@ export function NftCard({ nft, compact = false }: { nft: OwnedNft; compact?: boo
           <PillButton variant="blue" disabled={disabled} onClick={() => void handleRepair()}>
             {busy === "Repair"
               ? "Repairing…"
-              : `Repair · $${config ? formatUsdt(config.repairCost) : "…"} USDT`}
+              : `Repair · $${config ? formatUsdt(config.repairCost) : "…"} USDC`}
           </PillButton>
         )}
       </div>

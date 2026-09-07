@@ -94,7 +94,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "preconnect", href: "https://litdex-nft.test-hub.xyz" },
-      { rel: "preconnect", href: "https://sepolia.base.org" },
+      { rel: "preconnect", href: "https://mainnet.base.org" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@600&family=Space+Grotesk:wght@400;500;700&display=swap",

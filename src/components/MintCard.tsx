@@ -20,8 +20,7 @@ import {
   formatUsdt,
   nftContract,
   parseWalletError,
-  payTokenContract,
-  type PayToken,
+  usdcContract,
   type Voucher,
 } from "@/lib/litdex";
 
@@ -146,27 +145,22 @@ export function MintCard() {
   const remainingPublic = Math.max(0, WALLET_LIMIT - ownedCount);
   const [publicQty, setPublicQty] = useState(1);
   const publicQtyClamped = Math.max(1, Math.min(publicQty, Math.max(remainingPublic, 1)));
-  const [payToken, setPayToken] = useState<PayToken>("USDT");
-  const [voucherPayToken, setVoucherPayToken] = useState<PayToken>("USDT");
 
   async function handleMint(quantity: number) {
     if (!address || price === null || quantity < 1) return;
     const totalCost = price * BigInt(quantity);
     try {
-      const token = payTokenContract(payToken, readProvider());
+      const token = usdcContract(readProvider());
       const allowance = await token.allowance(address, NFT_ADDRESS);
       const signer = await getSigner();
       if (allowance < totalCost) {
         setStatus("Approving…");
-        const approveTx = await payTokenContract(payToken, signer).approve(NFT_ADDRESS, totalCost);
+        const approveTx = await usdcContract(signer).approve(NFT_ADDRESS, totalCost);
         await approveTx.wait();
       }
       setStatus("Minting…");
       const nft = nftContract(signer);
-      const tx =
-        payToken === "USDC"
-          ? await nft.mintBatchUSDC(quantity)
-          : await nft.mintBatch(quantity);
+      const tx = await nft.mintBatch(quantity);
       await tx.wait();
       try {
         const next = await nftRead().nextTokenId();
@@ -193,12 +187,12 @@ export function MintCard() {
       0n,
     );
     try {
-      const token = payTokenContract(voucherPayToken, readProvider());
+      const token = usdcContract(readProvider());
       const allowance = await token.allowance(address, NFT_ADDRESS);
       const signer = await getSigner();
       if (allowance < totalCost) {
         setStatus("Approving…");
-        const approveTx = await payTokenContract(voucherPayToken, signer).approve(
+        const approveTx = await usdcContract(signer).approve(
           NFT_ADDRESS,
           totalCost,
         );
@@ -212,12 +206,8 @@ export function MintCard() {
       const signatures = vouchers.map((v) => v.signature);
       const tx =
         vouchers.length === 1
-          ? voucherPayToken === "USDC"
-            ? await nft.mintWithVoucherUSDC(structs[0]!, signatures[0]!)
-            : await nft.mintWithVoucher(structs[0]!, signatures[0]!)
-          : voucherPayToken === "USDC"
-            ? await nft.mintWithVouchersBatchUSDC(structs, signatures)
-            : await nft.mintWithVouchersBatch(structs, signatures);
+          ? await nft.mintWithVoucher(structs[0]!, signatures[0]!)
+          : await nft.mintWithVouchersBatch(structs, signatures);
       await tx.wait();
       try {
         const next = await nftRead().nextTokenId();
@@ -245,7 +235,7 @@ export function MintCard() {
             Public stage
           </p>
           <p className="font-sans text-2xl font-bold text-[var(--mint-text)]">
-            ${price !== null ? formatUsdt(price) : "…"} {payToken}
+            ${price !== null ? formatUsdt(price) : "…"} USDC
           </p>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] px-3 py-1.5">
@@ -261,26 +251,6 @@ export function MintCard() {
       </div>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-1 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
-          <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
-            Pay with
-          </span>
-          {(["USDT", "USDC"] as const).map((token) => (
-            <button
-              key={token}
-              type="button"
-              disabled={busy}
-              onClick={() => setPayToken(token)}
-              className={`rounded-full px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40 ${
-                payToken === token
-                  ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-md"
-                  : "text-[var(--mint-text-muted)] hover:text-[var(--mint-primary)]"
-              }`}
-            >
-              {token}
-            </button>
-          ))}
-        </div>
 
         <p className="font-mono text-[12px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
           {started
@@ -337,7 +307,7 @@ export function MintCard() {
                     price !== null
                       ? formatUsdt(price * BigInt(publicQtyClamped))
                       : "…"
-                  } ${payToken}`}
+                  } USDC`}
         </button>
       </div>
 
@@ -410,7 +380,7 @@ export function MintCard() {
             </h3>
             <span className="mt-3 block h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-violet-600" />
             <p className="mt-4 font-sans text-sm font-medium text-[var(--mint-text-muted)]">
-              Common rarity to start · Base Sepolia
+              Common rarity to start · Base Mainnet
             </p>
           </div>
 
@@ -440,38 +410,16 @@ export function MintCard() {
               {/* Whitelist */}
               {voucherData && voucherData.totalVouchers > 0 && (
                 <div className="flex flex-col gap-4 rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
-              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-                <div className="min-w-0">
-                  <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
-                    Whitelist eligible
-                  </span>
-                  <p className="mt-2 font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
-                    {voucherData.totalVouchers} discounted mint
-                    {voucherData.totalVouchers === 1 ? "" : "s"} available
-                  </p>
-                </div>
-
-                <div className="flex shrink-0 items-center gap-1 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
-                  <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
-                    Pay with
-                  </span>
-                  {(["USDT", "USDC"] as const).map((token) => (
-                    <button
-                      key={token}
-                      type="button"
-                      disabled={busy}
-                      onClick={() => setVoucherPayToken(token)}
-                      className={`rounded-full px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40 ${
-                        voucherPayToken === token
-                          ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-md"
-                          : "text-[var(--mint-text-muted)] hover:text-[var(--mint-primary)]"
-                      }`}
-                    >
-                      {token}
-                    </button>
-                  ))}
-                </div>
+              <div className="min-w-0">
+                <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
+                  Whitelist eligible
+                </span>
+                <p className="mt-2 font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                  {voucherData.totalVouchers} discounted mint
+                  {voucherData.totalVouchers === 1 ? "" : "s"} available
+                </p>
               </div>
+
 
               {/* Priority voucher */}
               {priorityVoucher && price !== null && (
@@ -481,7 +429,7 @@ export function MintCard() {
                     <p className="font-sans text-base font-semibold">
                       You are eligible to mint at ${" "}
                       {formatUsdt(discountedPrice(price, priorityVoucher.discountBps))}{" "}
-                      {voucherPayToken}
+                      USDC
                     </p>
                     <button
                       disabled={!correctNetwork || busy}
@@ -511,7 +459,7 @@ export function MintCard() {
                         <p className="mt-1 font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-primary)]">
                           {discountLabel(first.discountBps)} off
                           {price !== null
-                            ? ` · $${formatUsdt(discountedPrice(price, first.discountBps))} ${voucherPayToken}`
+                            ? ` · $${formatUsdt(discountedPrice(price, first.discountBps))} USDC`
                             : ""}
                         </p>
                       </div>
@@ -556,7 +504,7 @@ export function MintCard() {
                   : status ??
                     `Mint ${selectedVouchers.length} in one transaction · $${
                       selectedCost !== null ? formatUsdt(selectedCost) : "…"
-                    } ${voucherPayToken}`}
+                    } USDC`}
               </button>
                 </div>
               )}
@@ -609,7 +557,7 @@ export function MintCard() {
                     Public stage
                   </p>
                   <p className="font-sans text-2xl font-bold text-[var(--mint-text)]">
-                    ${price !== null ? formatUsdt(price) : "…"} {payToken}
+                    ${price !== null ? formatUsdt(price) : "…"} USDC
                   </p>
                 </div>
                 <div className="flex items-center gap-2 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] px-3 py-1.5">
@@ -625,26 +573,6 @@ export function MintCard() {
               </div>
 
               <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-1 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
-                  <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
-                    Pay with
-                  </span>
-                  {(["USDT", "USDC"] as const).map((token) => (
-                    <button
-                      key={token}
-                      type="button"
-                      disabled={busy}
-                      onClick={() => setPayToken(token)}
-                      className={`rounded-full px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40 ${
-                        payToken === token
-                          ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-md"
-                          : "text-[var(--mint-text-muted)] hover:text-[var(--mint-primary)]"
-                      }`}
-                    >
-                      {token}
-                    </button>
-                  ))}
-                </div>
 
                 <p className="font-mono text-[12px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
                   {started
@@ -701,7 +629,7 @@ export function MintCard() {
                             price !== null
                               ? formatUsdt(price * BigInt(publicQtyClamped))
                               : "…"
-                          } ${payToken}`}
+                          } USDC`}
                 </button>
               </div>
 

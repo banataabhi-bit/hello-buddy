@@ -72,7 +72,7 @@ const NAV_LINKS: Array<[string, string, boolean?]> = [
 
 export const Component = ({ onMintClick }: { onMintClick?: () => void }) => {
   const { address, connect, connecting, hasWallet, disconnect, chainId } = useWallet();
-  const onBase = chainId === 84532;
+  const onBase = chainId === 8453;
   const [gameOpen, setGameOpen] = useState(false);
 
   return (
