@@ -56,11 +56,13 @@ export function artworkUrl(tokenId: bigint | number | string, version?: string):
 }
 
 
-export const USDT_ABI = [
+export const USDC_ABI = [
   "function approve(address spender, uint256 amount) returns (bool)",
   "function balanceOf(address) view returns (uint256)",
   "function allowance(address owner, address spender) view returns (uint256)",
 ];
+
+export const USDT_ABI = USDC_ABI;
 
 export const POINTS_ABI = [
   "function balance(address) view returns (uint256)",
@@ -135,7 +137,7 @@ export function formatPoints(value: bigint | string) {
 }
 
 export function openSeaUrl(tokenId: string | bigint) {
-  return `https://testnets.opensea.io/assets/base-sepolia/${NFT_ADDRESS}/${tokenId.toString()}`;
+  return `https://opensea.io/assets/base/${NFT_ADDRESS}/${tokenId.toString()}`;
 }
 
 export function parseWalletError(err: unknown, fallback: string) {
