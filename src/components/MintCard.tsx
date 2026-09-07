@@ -410,38 +410,16 @@ export function MintCard() {
               {/* Whitelist */}
               {voucherData && voucherData.totalVouchers > 0 && (
                 <div className="flex flex-col gap-4 rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
-              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-                <div className="min-w-0">
-                  <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
-                    Whitelist eligible
-                  </span>
-                  <p className="mt-2 font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
-                    {voucherData.totalVouchers} discounted mint
-                    {voucherData.totalVouchers === 1 ? "" : "s"} available
-                  </p>
-                </div>
-
-                <div className="flex shrink-0 items-center gap-1 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
-                  <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
-                    Pay with
-                  </span>
-                  {(["USDT", "USDC"] as const).map((token) => (
-                    <button
-                      key={token}
-                      type="button"
-                      disabled={busy}
-                      onClick={() => setVoucherPayToken(token)}
-                      className={`rounded-full px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40 ${
-                        voucherPayToken === token
-                          ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-md"
-                          : "text-[var(--mint-text-muted)] hover:text-[var(--mint-primary)]"
-                      }`}
-                    >
-                      {token}
-                    </button>
-                  ))}
-                </div>
+              <div className="min-w-0">
+                <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
+                  Whitelist eligible
+                </span>
+                <p className="mt-2 font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                  {voucherData.totalVouchers} discounted mint
+                  {voucherData.totalVouchers === 1 ? "" : "s"} available
+                </p>
               </div>
+
 
               {/* Priority voucher */}
               {priorityVoucher && price !== null && (
