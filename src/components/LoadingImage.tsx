@@ -24,9 +24,13 @@ export function LoadingImage({
   eager?: boolean;
 }) {
   const [loaded, setLoaded] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     setLoaded(false);
+    setAttempt(0);
+    setFailed(false);
   }, [src]);
 
   // If the bitmap is already in the browser cache the load event can fire
@@ -35,28 +39,48 @@ export function LoadingImage({
     if (el && el.complete && el.naturalWidth > 0) setLoaded(true);
   }, []);
 
+  // The metadata API can briefly 5xx while it re-renders freshly levelled
+  // artwork; retry a few times instead of leaving a broken image on screen.
+  const handleError = useCallback(() => {
+    setAttempt((prev) => {
+      if (prev >= 3) {
+        setFailed(true);
+        setLoaded(true);
+        return prev;
+      }
+      window.setTimeout(() => setAttempt(prev + 1), 800 * (prev + 1));
+      return prev;
+    });
+  }, []);
+
+  const resolvedSrc = attempt > 0 ? `${src}${src.includes("?") ? "&" : "?"}r=${attempt}` : src;
+
   return (
     <div className={cn("relative", wrapperClassName)}>
-      {placeholderSrc && !loaded && (
+      {placeholderSrc && (!loaded || failed) && (
         <img
           src={placeholderSrc}
-          alt=""
-          aria-hidden
+          alt={failed ? alt : ""}
+          aria-hidden={failed ? undefined : true}
           className={cn("absolute inset-0", className)}
         />
       )}
       <img
+        key={resolvedSrc}
         ref={imgRef}
-        src={src}
-        alt={alt}
+        src={resolvedSrc}
+        alt={failed ? "" : alt}
         loading={eager ? "eager" : "lazy"}
         decoding="async"
         fetchPriority={eager ? "high" : "auto"}
-        onLoad={() => setLoaded(true)}
-        onError={() => setLoaded(true)}
+        onLoad={() => {
+          setFailed(false);
+          setLoaded(true);
+        }}
+        onError={handleError}
         className={cn(
           "relative transition-opacity duration-300",
-          loaded ? "opacity-100" : "opacity-0",
+          loaded && !failed ? "opacity-100" : "opacity-0",
           className,
         )}
       />
