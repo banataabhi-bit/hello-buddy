@@ -1,4 +1,6 @@
 import { motion } from "motion/react";
+import { useState } from "react";
+import { GameModal } from "@/components/GameModal";
 import { HERO_EPIC_IMAGE, HERO_LEGEND_IMAGE } from "@/lib/images";
 import { useWallet } from "@/hooks/useWallet";
 import { truncateAddress } from "@/lib/litdex";
@@ -60,16 +62,18 @@ const CircularBadge = ({ onClick }: { onClick?: () => void }) => (
 const HARD_SHADOW =
   "1px 1px 0 #001A99, 2px 2px 0 #001A99, 3px 3px 0 #001A99, 4px 4px 0 #001A99, 5px 5px 0 #001A99, 6px 6px 0 #001A99, 7px 7px 0 #001A99, 8px 8px 0 #001A99, 9px 9px 0 #001A99, 10px 10px 0 #001A99, 11px 11px 0 #001A99, 12px 12px 0 #001A99, 13px 13px 0 #001A99, 14px 14px 0 #001A99";
 
-const NAV_LINKS: Array<[string, string]> = [
-  ["Champions", "#champions"],
-  ["My points", "#points"],
-  ["Levels", "/levels"],
-  ["Mint", "#mint"],
+const NAV_LINKS: Array<[string, string, boolean?]> = [
+  ["Champions", "#champions", false],
+  ["My points", "#points", false],
+  ["Levels", "/levels", false],
+  ["Mint", "#mint", false],
+  ["Game", "#game", true],
 ];
 
 export const Component = ({ onMintClick }: { onMintClick?: () => void }) => {
   const { address, connect, connecting, hasWallet, disconnect, chainId } = useWallet();
   const onBase = chainId === 84532;
+  const [gameOpen, setGameOpen] = useState(false);
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-[#0038FF] font-sans selection:bg-[#CCFF00] selection:text-black">
@@ -95,15 +99,25 @@ export const Component = ({ onMintClick }: { onMintClick?: () => void }) => {
         </div>
 
         <div className="hidden items-center space-x-2 md:flex">
-          {NAV_LINKS.map(([item, href]) => (
-            <a
-              key={item}
-              href={href}
-              className="btn fx-9 btn-pill btn-ghost nav-link"
-            >
-              <span className="btn-label">{item}</span>
-            </a>
-          ))}
+          {NAV_LINKS.map(([item, href, isGame]) =>
+            isGame ? (
+              <button
+                key={item}
+                onClick={() => setGameOpen(true)}
+                className="btn fx-9 btn-pill btn-ghost nav-link"
+              >
+                <span className="btn-label">{item}</span>
+              </button>
+            ) : (
+              <a
+                key={item}
+                href={href}
+                className="btn fx-9 btn-pill btn-ghost nav-link"
+              >
+                <span className="btn-label">{item}</span>
+              </a>
+            )
+          )}
         </div>
 
         {address ? (
@@ -200,6 +214,8 @@ export const Component = ({ onMintClick }: { onMintClick?: () => void }) => {
           </div>
         </div>
       </main>
+
+      <GameModal open={gameOpen} onOpenChange={setGameOpen} />
     </div>
   );
 };
