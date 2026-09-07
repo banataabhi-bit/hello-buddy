@@ -354,19 +354,8 @@ export function MintCard() {
       className="scroll-mt-24 rounded-[2.5rem] border border-[var(--mint-border)] bg-gradient-to-br from-slate-50 via-white to-indigo-50 p-6 shadow-2xl md:p-10"
     >
       <div className="grid gap-8 lg:grid-cols-2">
-        {/* Left: "Mint a champion" artwork + progress */}
-        <div className="flex flex-col gap-6 lg:sticky lg:top-8 lg:self-start">
-          <div>
-            <h3 className="font-sans text-2xl font-bold tracking-tight text-[var(--mint-text)] md:text-3xl">
-              Mint a champion
-            </h3>
-            <span className="mt-3 block h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-violet-600" />
-            <p className="mt-4 font-sans text-sm font-medium text-[var(--mint-text-muted)]">
-              Common rarity to start · Base Sepolia
-            </p>
-          </div>
-
-          {/* Pass-card carousel */}
+        {/* Left: pass-card carousel */}
+        <div className="relative flex flex-col gap-4 lg:sticky lg:top-8 lg:self-start">
           <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] shadow-xl">
             {PASS_CARD_IMAGES.map((pass, i) => (
               <img
@@ -411,6 +400,19 @@ export function MintCard() {
               {activePass?.label}
             </span>
           </div>
+        </div>
+
+        {/* Right: mint controls */}
+        <div className="flex flex-col gap-6">
+          <div>
+            <h3 className="font-sans text-2xl font-bold tracking-tight text-[var(--mint-text)] md:text-3xl">
+              Mint a champion
+            </h3>
+            <span className="mt-3 block h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-violet-600" />
+            <p className="mt-4 font-sans text-sm font-medium text-[var(--mint-text-muted)]">
+              Common rarity to start · Base Sepolia
+            </p>
+          </div>
 
           {/* Progress */}
           <div className="rounded-2xl border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm">
@@ -431,10 +433,138 @@ export function MintCard() {
               />
             </div>
           </div>
-        </div>
 
-        {/* Right: mint controls — whitelist + public side by side */}
-        <div className="flex flex-col gap-6">
+          {/* Mint actions */}
+          {address && (
+            <div
+              className={
+                voucherData && voucherData.totalVouchers > 0
+                  ? "grid gap-6 xl:grid-cols-2 items-start"
+                  : "grid gap-6"
+              }
+            >
+              {/* Whitelist */}
+              {voucherData && voucherData.totalVouchers > 0 && (
+                <div className="flex flex-col gap-4 rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
+                  Whitelist eligible{" "}
+                  <span className="opacity-80">{"•"}</span>{" "}
+                  {voucherData.totalVouchers} discounted mint
+                  {voucherData.totalVouchers === 1 ? "" : "s"} available
+                </span>
+
+                <div className="flex items-center gap-1 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
+                  <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                    Pay with
+                  </span>
+                  {(["USDT", "USDC"] as const).map((token) => (
+                    <button
+                      key={token}
+                      type="button"
+                      disabled={busy}
+                      onClick={() => setVoucherPayToken(token)}
+                      className={`rounded-full px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40 ${
+                        voucherPayToken === token
+                          ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-md"
+                          : "text-[var(--mint-text-muted)] hover:text-[var(--mint-primary)]"
+                      }`}
+                    >
+                      {token}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Priority voucher */}
+              {priorityVoucher && price !== null && (
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-blue-900 p-5 text-white shadow-md">
+                  <div className="absolute -right-8 -top-8 size-32 rounded-full bg-[var(--mint-primary)]/20 blur-2xl" />
+                  <div className="relative flex flex-wrap items-center justify-between gap-4">
+                    <p className="font-sans text-base font-semibold">
+                      You are eligible to mint at ${" "}
+                      {formatUsdt(discountedPrice(price, priorityVoucher.discountBps))}{" "}
+                      {voucherPayToken}
+                    </p>
+                    <button
+                      disabled={!correctNetwork || busy}
+                      onClick={() => void handleVoucherMint([priorityVoucher])}
+                      className="rounded-full bg-white px-6 py-2.5 font-mono text-[12px] font-bold uppercase tracking-widest text-[var(--mint-text)] shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
+                    >
+                      {status ?? "Mint"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Category rows */}
+              <div className="flex flex-col gap-3">
+                {voucherGroups.map(([category, vouchers]) => {
+                  const qty = Math.min(qtyFor(category), vouchers.length);
+                  const first = vouchers[0]!;
+                  return (
+                    <div
+                      key={category}
+                      className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--mint-border)] bg-[var(--mint-muted)] p-4 transition-shadow duration-300 hover:shadow-sm"
+                    >
+                      <div>
+                        <p className="font-mono text-sm font-bold uppercase tracking-widest text-[var(--mint-text)]">
+                          {category} x {vouchers.length}
+                        </p>
+                        <p className="mt-1 font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-primary)]">
+                          {discountLabel(first.discountBps)} off
+                          {price !== null
+                            ? ` · $${formatUsdt(discountedPrice(price, first.discountBps))} ${voucherPayToken}`
+                            : ""}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 rounded-full border border-[var(--mint-border)] bg-[var(--mint-surface)] p-1">
+                        <button
+                          aria-label={`Decrease ${category} quantity`}
+                          disabled={qty <= 0 || busy}
+                          onClick={() => setQty(category, qty - 1, vouchers.length)}
+                          className="grid size-8 place-items-center rounded-full text-[var(--mint-text)] transition-all hover:bg-[var(--mint-muted)] hover:text-[var(--mint-primary)] active:scale-90 disabled:opacity-40"
+                        >
+                          <Minus className="size-3.5" />
+                        </button>
+                        <span className="min-w-6 text-center font-mono text-sm font-bold text-[var(--mint-text)]">
+                          {qty}
+                        </span>
+                        <button
+                          aria-label={`Increase ${category} quantity`}
+                          disabled={qty >= vouchers.length || busy}
+                          onClick={() => setQty(category, qty + 1, vouchers.length)}
+                          className="grid size-8 place-items-center rounded-full text-[var(--mint-text)] transition-all hover:bg-[var(--mint-muted)] hover:text-[var(--mint-primary)] active:scale-90 disabled:opacity-40"
+                        >
+                          <Plus className="size-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <button
+                disabled={
+                  !correctNetwork ||
+                  busy ||
+                  price === null ||
+                  selectedVouchers.length === 0
+                }
+                onClick={() => void handleVoucherMint(selectedVouchers)}
+                className="mt-1 w-full rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-3.5 font-mono text-[13px] font-bold uppercase tracking-widest text-white shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/25 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
+              >
+                {selectedVouchers.length === 0
+                  ? "Select vouchers to mint"
+                  : status ??
+                    `Mint ${selectedVouchers.length} in one transaction · $${
+                      selectedCost !== null ? formatUsdt(selectedCost) : "…"
+                    } ${voucherPayToken}`}
+              </button>
+            </div>
+          )}
+
+          {/* Not connected */}
           {!address && (
             <div className="flex flex-col gap-4">
               <div className="grid gap-4 sm:grid-cols-2">
@@ -470,137 +600,114 @@ export function MintCard() {
             </div>
           )}
 
+          {/* Public stage */}
           {address && (
-            <div
-              className={
-                voucherData && voucherData.totalVouchers > 0
-                  ? "grid gap-6 lg:grid-cols-2 items-start"
-                  : "grid gap-6"
-              }
-            >
-              {/* Whitelist */}
-              {voucherData && voucherData.totalVouchers > 0 && (
-                <div className="flex flex-col gap-4 rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
-                      Whitelist eligible{" "}
-                      <span className="opacity-80">{"•"}</span>{" "}
-                      {voucherData.totalVouchers} discounted mint
-                      {voucherData.totalVouchers === 1 ? "" : "s"} available
-                    </span>
+            <div className="rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                    Public stage
+                  </p>
+                  <p className="font-sans text-2xl font-bold text-[var(--mint-text)]">
+                    ${price !== null ? formatUsdt(price) : "…"} {payToken}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] px-3 py-1.5">
+                  <span
+                    className={`size-2 rounded-full ${
+                      started ? "bg-[var(--mint-primary)]" : "bg-[var(--mint-success)]"
+                    }`}
+                  />
+                  <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text)]">
+                    {started ? "Minting now" : "Not started"}
+                  </span>
+                </div>
+              </div>
 
-                    <div className="flex items-center gap-1 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
-                      <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
-                        Pay with
-                      </span>
-                      {(["USDT", "USDC"] as const).map((token) => (
-                        <button
-                          key={token}
-                          type="button"
-                          disabled={busy}
-                          onClick={() => setVoucherPayToken(token)}
-                          className={`rounded-full px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40 ${
-                            voucherPayToken === token
-                              ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-md"
-                              : "text-[var(--mint-text-muted)] hover:text-[var(--mint-primary)]"
-                          }`}
-                        >
-                          {token}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-1 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
+                  <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                    Pay with
+                  </span>
+                  {(["USDT", "USDC"] as const).map((token) => (
+                    <button
+                      key={token}
+                      type="button"
+                      disabled={busy}
+                      onClick={() => setPayToken(token)}
+                      className={`rounded-full px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40 ${
+                        payToken === token
+                          ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-md"
+                          : "text-[var(--mint-text-muted)] hover:text-[var(--mint-primary)]"
+                      }`}
+                    >
+                      {token}
+                    </button>
+                  ))}
+                </div>
 
-                  {/* Priority voucher */}
-                  {priorityVoucher && price !== null && (
-                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-blue-900 p-5 text-white shadow-md">
-                      <div className="absolute -right-8 -top-8 size-32 rounded-full bg-[var(--mint-primary)]/20 blur-2xl" />
-                      <div className="relative flex flex-wrap items-center justify-between gap-4">
-                        <p className="font-sans text-base font-semibold">
-                          You are eligible to mint at ${" "}
-                          {formatUsdt(discountedPrice(price, priorityVoucher.discountBps))}{" "}
-                          {voucherPayToken}
-                        </p>
-                        <button
-                          disabled={!correctNetwork || busy}
-                          onClick={() => void handleVoucherMint([priorityVoucher])}
-                          className="rounded-full bg-white px-6 py-2.5 font-mono text-[12px] font-bold uppercase tracking-widest text-[var(--mint-text)] shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
-                        >
-                          {status ?? "Mint"}
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                <p className="font-mono text-[12px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                  {started
+                    ? "Minting now"
+                    : countdown
+                      ? `Starts in ${countdown}`
+                      : "Not scheduled"}
+                </p>
+              </div>
 
-                  {/* Category rows */}
-                  <div className="flex flex-col gap-3">
-                    {voucherGroups.map(([category, vouchers]) => {
-                      const qty = Math.min(qtyFor(category), vouchers.length);
-                      const first = vouchers[0]!;
-                      return (
-                        <div
-                          key={category}
-                          className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--mint-border)] bg-[var(--mint-muted)] p-4 transition-shadow duration-300 hover:shadow-sm"
-                        >
-                          <div>
-                            <p className="font-mono text-sm font-bold uppercase tracking-widest text-[var(--mint-text)]">
-                              {category} x {vouchers.length}
-                            </p>
-                            <p className="mt-1 font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-primary)]">
-                              {discountLabel(first.discountBps)} off
-                              {price !== null
-                                ? ` · $${formatUsdt(discountedPrice(price, first.discountBps))} ${voucherPayToken}`
-                                : ""}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2 rounded-full border border-[var(--mint-border)] bg-[var(--mint-surface)] p-1">
-                            <button
-                              aria-label={`Decrease ${category} quantity`}
-                              disabled={qty <= 0 || busy}
-                              onClick={() => setQty(category, qty - 1, vouchers.length)}
-                              className="grid size-8 place-items-center rounded-full text-[var(--mint-text)] transition-all hover:bg-[var(--mint-muted)] hover:text-[var(--mint-primary)] active:scale-90 disabled:opacity-40"
-                            >
-                              <Minus className="size-3.5" />
-                            </button>
-                            <span className="min-w-6 text-center font-mono text-sm font-bold text-[var(--mint-text)]">
-                              {qty}
-                            </span>
-                            <button
-                              aria-label={`Increase ${category} quantity`}
-                              disabled={qty >= vouchers.length || busy}
-                              onClick={() => setQty(category, qty + 1, vouchers.length)}
-                              className="grid size-8 place-items-center rounded-full text-[var(--mint-text)] transition-all hover:bg-[var(--mint-muted)] hover:text-[var(--mint-primary)] active:scale-90 disabled:opacity-40"
-                            >
-                              <Plus className="size-3.5" />
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-2 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
                   <button
-                    disabled={
-                      !correctNetwork ||
-                      busy ||
-                      price === null ||
-                      selectedVouchers.length === 0
-                    }
-                    onClick={() => void handleVoucherMint(selectedVouchers)}
-                    className="mt-1 w-full rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-6 py-3.5 font-mono text-[13px] font-bold uppercase tracking-widest text-white shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/25 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
+                    aria-label="Decrease public mint quantity"
+                    disabled={publicQtyClamped <= 1 || busy}
+                    onClick={() => setPublicQty(publicQtyClamped - 1)}
+                    className="grid size-8 place-items-center rounded-full text-[var(--mint-text)] transition-all hover:bg-[var(--mint-surface)] hover:text-[var(--mint-primary)] active:scale-90 disabled:opacity-40"
                   >
-                    {selectedVouchers.length === 0
-                      ? "Select vouchers to mint"
-                      : status ??
-                        `Mint ${selectedVouchers.length} in one transaction · ${
-                          selectedCost !== null ? formatUsdt(selectedCost) : "…"
-                        } ${voucherPayToken}`}
+                    <Minus className="size-3.5" />
+                  </button>
+                  <span className="min-w-6 text-center font-mono text-sm font-bold text-[var(--mint-text)]">
+                    {publicQtyClamped}
+                  </span>
+                  <button
+                    aria-label="Increase public mint quantity"
+                    disabled={publicQtyClamped >= remainingPublic || busy}
+                    onClick={() => setPublicQty(publicQtyClamped + 1)}
+                    className="grid size-8 place-items-center rounded-full text-[var(--mint-text)] transition-all hover:bg-[var(--mint-surface)] hover:text-[var(--mint-primary)] active:scale-90 disabled:opacity-40"
+                  >
+                    <Plus className="size-3.5" />
                   </button>
                 </div>
-              )}
 
-              {/* Public stage */}
-              {publicStageCard}
+                <button
+                  disabled={
+                    !correctNetwork ||
+                    soldOut ||
+                    busy ||
+                    !mintStatus ||
+                    !started ||
+                    limitReached
+                  }
+                  onClick={() => void handleMint(publicQtyClamped)}
+                  className="rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-8 py-3.5 font-mono text-[13px] font-bold uppercase tracking-widest text-white shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/25 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
+                >
+                  {soldOut
+                    ? "Sold out"
+                    : !started
+                      ? "Mint when live"
+                      : limitReached
+                        ? "Limit reached"
+                        : status ??
+                          `Mint ${publicQtyClamped} · $${
+                            price !== null
+                              ? formatUsdt(price * BigInt(publicQtyClamped))
+                              : "…"
+                          } ${payToken}`}
+                </button>
+              </div>
+
+              <p className="mt-5 text-right font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+                Limit {WALLET_LIMIT} per wallet · You own {ownedCount}
+              </p>
             </div>
           )}
 
