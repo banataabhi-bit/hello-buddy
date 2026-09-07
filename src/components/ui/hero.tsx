@@ -62,11 +62,12 @@ const CircularBadge = ({ onClick }: { onClick?: () => void }) => (
 const HARD_SHADOW =
   "1px 1px 0 #001A99, 2px 2px 0 #001A99, 3px 3px 0 #001A99, 4px 4px 0 #001A99, 5px 5px 0 #001A99, 6px 6px 0 #001A99, 7px 7px 0 #001A99, 8px 8px 0 #001A99, 9px 9px 0 #001A99, 10px 10px 0 #001A99, 11px 11px 0 #001A99, 12px 12px 0 #001A99, 13px 13px 0 #001A99, 14px 14px 0 #001A99";
 
-const NAV_LINKS: Array<[string, string]> = [
-  ["Champions", "#champions"],
-  ["My points", "#points"],
-  ["Levels", "/levels"],
-  ["Mint", "#mint"],
+const NAV_LINKS: Array<[string, string, boolean?]> = [
+  ["Champions", "#champions", false],
+  ["My points", "#points", false],
+  ["Levels", "/levels", false],
+  ["Mint", "#mint", false],
+  ["Game", "#game", true],
 ];
 
 export const Component = ({ onMintClick }: { onMintClick?: () => void }) => {
