@@ -76,8 +76,9 @@ export const Route = createFileRoute("/levels")({
 });
 
 function LevelsView() {
-  const { address, connect } = useWallet();
+  const { address, connect, correctNetwork, switchNetwork } = useWallet();
   const { data, isLoading } = useOwnedNfts();
+
   const [rarity, setRarity] = useState("all");
   const [status, setStatus] = useState("all");
   const [sort, setSort] = useState("highest");
