@@ -99,15 +99,25 @@ export const Component = ({ onMintClick }: { onMintClick?: () => void }) => {
         </div>
 
         <div className="hidden items-center space-x-2 md:flex">
-          {NAV_LINKS.map(([item, href]) => (
-            <a
-              key={item}
-              href={href}
-              className="btn fx-9 btn-pill btn-ghost nav-link"
-            >
-              <span className="btn-label">{item}</span>
-            </a>
-          ))}
+          {NAV_LINKS.map(([item, href, isGame]) =>
+            isGame ? (
+              <button
+                key={item}
+                onClick={() => setGameOpen(true)}
+                className="btn fx-9 btn-pill btn-ghost nav-link"
+              >
+                <span className="btn-label">{item}</span>
+              </button>
+            ) : (
+              <a
+                key={item}
+                href={href}
+                className="btn fx-9 btn-pill btn-ghost nav-link"
+              >
+                <span className="btn-label">{item}</span>
+              </a>
+            )
+          )}
         </div>
 
         {address ? (
