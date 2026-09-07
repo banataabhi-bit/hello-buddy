@@ -12,7 +12,9 @@ import {
   useLevelCost,
   useNftArtwork,
   useRefreshAll,
+  waitForTokenStateChange,
 } from "@/hooks/useLitdex";
+
 import { useWallet } from "@/hooks/useWallet";
 import {
   MAX_LEVEL,
