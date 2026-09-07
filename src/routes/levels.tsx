@@ -128,6 +128,18 @@ function LevelsView() {
                 <span className="btn-label">Connect wallet</span>
               </button>
             </div>
+          ) : !correctNetwork ? (
+            <div className="rounded-[2rem] border-2 border-dashed border-black/15 bg-[#F4F4F2] p-10 text-center">
+              <p className="btn-text text-black/60">
+                You&apos;re on another network — switch to Base Sepolia to see your champions.
+              </p>
+              <button
+                onClick={() => void switchNetwork()}
+                className="btn fx-9 btn-pill btn-blue mt-6"
+              >
+                <span className="btn-label">switch to base</span>
+              </button>
+            </div>
           ) : isLoading ? (
             <LoadingBlock label="Scanning token IDs…" />
           ) : list.length === 0 ? (
@@ -136,6 +148,7 @@ function LevelsView() {
                 ? "No champions match these filters."
                 : "You don't own any Litdex champions yet."}
             </div>
+
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {list.map((nft) => (
