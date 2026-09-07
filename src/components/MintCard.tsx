@@ -293,7 +293,7 @@ export function MintCard() {
         </div>
 
         {/* Right: mint controls */}
-        <div className="flex flex-col justify-between gap-6">
+        <div className="flex flex-col gap-6">
           <div>
             <h3 className="font-sans text-2xl font-bold tracking-tight text-[var(--mint-text)] md:text-3xl">
               Mint a champion
