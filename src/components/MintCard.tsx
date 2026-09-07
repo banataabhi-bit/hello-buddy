@@ -237,6 +237,116 @@ export function MintCard() {
     }
   }
 
+  const publicStageCard = (
+    <div className="rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="space-y-1">
+          <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+            Public stage
+          </p>
+          <p className="font-sans text-2xl font-bold text-[var(--mint-text)]">
+            ${price !== null ? formatUsdt(price) : "…"} {payToken}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] px-3 py-1.5">
+          <span
+            className={`size-2 rounded-full ${
+              started ? "bg-[var(--mint-primary)]" : "bg-[var(--mint-success)]"
+            }`}
+          />
+          <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text)]">
+            {started ? "Minting now" : "Not started"}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-1 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
+          <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+            Pay with
+          </span>
+          {(["USDT", "USDC"] as const).map((token) => (
+            <button
+              key={token}
+              type="button"
+              disabled={busy}
+              onClick={() => setPayToken(token)}
+              className={`rounded-full px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40 ${
+                payToken === token
+                  ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-md"
+                  : "text-[var(--mint-text-muted)] hover:text-[var(--mint-primary)]"
+              }`}
+            >
+              {token}
+            </button>
+          ))}
+        </div>
+
+        <p className="font-mono text-[12px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+          {started
+            ? "Minting now"
+            : countdown
+              ? `Starts in ${countdown}`
+              : "Not scheduled"}
+        </p>
+      </div>
+
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-2 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
+          <button
+            aria-label="Decrease public mint quantity"
+            disabled={publicQtyClamped <= 1 || busy}
+            onClick={() => setPublicQty(publicQtyClamped - 1)}
+            className="grid size-8 place-items-center rounded-full text-[var(--mint-text)] transition-all hover:bg-[var(--mint-surface)] hover:text-[var(--mint-primary)] active:scale-90 disabled:opacity-40"
+          >
+            <Minus className="size-3.5" />
+          </button>
+          <span className="min-w-6 text-center font-mono text-sm font-bold text-[var(--mint-text)]">
+            {publicQtyClamped}
+          </span>
+          <button
+            aria-label="Increase public mint quantity"
+            disabled={publicQtyClamped >= remainingPublic || busy}
+            onClick={() => setPublicQty(publicQtyClamped + 1)}
+            className="grid size-8 place-items-center rounded-full text-[var(--mint-text)] transition-all hover:bg-[var(--mint-surface)] hover:text-[var(--mint-primary)] active:scale-90 disabled:opacity-40"
+          >
+            <Plus className="size-3.5" />
+          </button>
+        </div>
+
+        <button
+          disabled={
+            !correctNetwork ||
+            soldOut ||
+            busy ||
+            !mintStatus ||
+            !started ||
+            limitReached
+          }
+          onClick={() => void handleMint(publicQtyClamped)}
+          className="rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-8 py-3.5 font-mono text-[13px] font-bold uppercase tracking-widest text-white shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/25 active:translate-y-0 active:scale-[0.98] disabled:opacity-40 disabled:hover:transform-none"
+        >
+          {soldOut
+            ? "Sold out"
+            : !started
+              ? "Mint when live"
+              : limitReached
+                ? "Limit reached"
+                : status ??
+                  `Mint ${publicQtyClamped} · ${
+                    price !== null
+                      ? formatUsdt(price * BigInt(publicQtyClamped))
+                      : "…"
+                  } ${payToken}`}
+        </button>
+      </div>
+
+      <p className="mt-5 text-right font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
+        Limit {WALLET_LIMIT} per wallet · You own {ownedCount}
+      </p>
+    </div>
+  );
+
   return (
     <div
       id="mint"
