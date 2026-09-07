@@ -324,9 +324,18 @@ export function MintCard() {
             </div>
           </div>
 
-          {/* Whitelist */}
-          {address && voucherData && voucherData.totalVouchers > 0 && (
-            <div className="flex flex-col gap-4 rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
+          {/* Mint actions */}
+          {address && (
+            <div
+              className={
+                voucherData && voucherData.totalVouchers > 0
+                  ? "grid gap-6 xl:grid-cols-2 items-start"
+                  : "grid gap-6"
+              }
+            >
+              {/* Whitelist */}
+              {voucherData && voucherData.totalVouchers > 0 && (
+                <div className="flex flex-col gap-4 rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
                   Whitelist eligible{" "}
