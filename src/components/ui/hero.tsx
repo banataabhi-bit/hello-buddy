@@ -214,6 +214,8 @@ export const Component = ({ onMintClick }: { onMintClick?: () => void }) => {
           </div>
         </div>
       </main>
+
+      <GameModal open={gameOpen} onOpenChange={setGameOpen} />
     </div>
   );
 };
