@@ -110,7 +110,7 @@ export function formatTierLabel(
   nft: { rarity: number; level: number },
   oneBased = false,
 ): string {
-  if (nft.rarity === 3) return "MAX 🔥";
+  if (nft.rarity === 3) return "MAX";
   return `Tier ${oneBased ? nft.level + 1 : nft.level}`;
 }
 
