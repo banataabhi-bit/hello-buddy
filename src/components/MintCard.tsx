@@ -436,13 +436,7 @@ export function MintCard() {
 
           {/* Mint actions */}
           {address && (
-            <div
-              className={
-                voucherData && voucherData.totalVouchers > 0
-                  ? "grid gap-6 xl:grid-cols-2 items-start"
-                  : "grid gap-6"
-              }
-            >
+            <div className="grid gap-6">
               {/* Whitelist */}
               {voucherData && voucherData.totalVouchers > 0 && (
                 <div className="flex flex-col gap-4 rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
