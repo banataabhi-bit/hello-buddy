@@ -436,18 +436,12 @@ export function MintCard() {
 
           {/* Mint actions */}
           {address && (
-            <div
-              className={
-                voucherData && voucherData.totalVouchers > 0
-                  ? "grid gap-6 xl:grid-cols-2 items-start"
-                  : "grid gap-6"
-              }
-            >
+            <div className="grid gap-6">
               {/* Whitelist */}
               {voucherData && voucherData.totalVouchers > 0 && (
                 <div className="flex flex-col gap-4 rounded-[2rem] border border-[var(--mint-border)] bg-[var(--mint-surface)] p-5 shadow-sm md:p-6">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+                <div className="min-w-0">
                   <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
                     Whitelist eligible
                   </span>
@@ -457,7 +451,7 @@ export function MintCard() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-1 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
+                <div className="flex shrink-0 items-center gap-1 rounded-full border border-[var(--mint-border)] bg-[var(--mint-muted)] p-1">
                   <span className="pl-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--mint-text-muted)]">
                     Pay with
                   </span>
@@ -508,10 +502,10 @@ export function MintCard() {
                   return (
                     <div
                       key={category}
-                      className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--mint-border)] bg-[var(--mint-muted)] p-4 transition-shadow duration-300 hover:shadow-sm"
+                      className="flex items-center justify-between gap-4 rounded-2xl border border-[var(--mint-border)] bg-[var(--mint-muted)] p-4 transition-shadow duration-300 hover:shadow-sm"
                     >
-                      <div>
-                        <p className="font-mono text-sm font-bold uppercase tracking-widest text-[var(--mint-text)]">
+                      <div className="min-w-0">
+                        <p className="truncate font-mono text-sm font-bold uppercase tracking-widest text-[var(--mint-text)]">
                           {category} x {vouchers.length}
                         </p>
                         <p className="mt-1 font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--mint-primary)]">
