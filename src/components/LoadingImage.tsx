@@ -57,26 +57,30 @@ export function LoadingImage({
 
   return (
     <div className={cn("relative", wrapperClassName)}>
-      {placeholderSrc && !loaded && (
+      {placeholderSrc && (!loaded || failed) && (
         <img
           src={placeholderSrc}
-          alt=""
-          aria-hidden
+          alt={failed ? alt : ""}
+          aria-hidden={failed ? undefined : true}
           className={cn("absolute inset-0", className)}
         />
       )}
       <img
+        key={resolvedSrc}
         ref={imgRef}
-        src={src}
-        alt={alt}
+        src={resolvedSrc}
+        alt={failed ? "" : alt}
         loading={eager ? "eager" : "lazy"}
         decoding="async"
         fetchPriority={eager ? "high" : "auto"}
-        onLoad={() => setLoaded(true)}
-        onError={() => setLoaded(true)}
+        onLoad={() => {
+          setFailed(false);
+          setLoaded(true);
+        }}
+        onError={handleError}
         className={cn(
           "relative transition-opacity duration-300",
-          loaded ? "opacity-100" : "opacity-0",
+          loaded && !failed ? "opacity-100" : "opacity-0",
           className,
         )}
       />
