@@ -74,7 +74,7 @@ function RarityFilter({
 
 export function NftSection() {
   const { address, correctNetwork, switchNetwork } = useWallet();
-  const { data, isLoading } = useOwnedNfts();
+  const { data, isLoading, isFetching, isError, error, refetch } = useOwnedNfts();
   const [rarity, setRarity] = useState<RarityKey>("all");
   const [page, setPage] = useState(0);
 
@@ -129,8 +129,22 @@ export function NftSection() {
         </div>
       )}
 
-      {isLoading && <LoadingBlock label="Scanning token IDs…" />}
-      {!isLoading && filtered.length === 0 && correctNetwork && (
+      {isLoading && <LoadingBlock label="Loading your champions…" />}
+      {!isFetching && isError && (
+        <div className="rounded-[2rem] border-2 border-dashed border-red-200 bg-red-50 p-8 text-center">
+          <p className="btn-text text-red-700">
+            Couldn&apos;t load your champions.{" "}
+            {error instanceof Error ? error.message : "Please try refreshing the page."}
+          </p>
+          <button
+            onClick={() => void refetch()}
+            className="btn fx-9 btn-pill btn-blue mt-4"
+          >
+            <span className="btn-label">Retry</span>
+          </button>
+        </div>
+      )}
+      {!isFetching && !isError && filtered.length === 0 && correctNetwork && (
         <div className="btn-text rounded-[2rem] border-2 border-dashed border-black/15 bg-[#F4F4F2] p-8 text-center text-black/50">
           {data && data.length > 0
             ? "No champions match this filter."

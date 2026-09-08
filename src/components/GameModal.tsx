@@ -39,7 +39,7 @@ function ChampionRow({
 
 export function GameModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const { address, connect, connecting, hasWallet, correctNetwork, switchNetwork } = useWallet();
-  const { data, isLoading } = useOwnedNfts();
+  const { data, isLoading, isFetching, isError, error, refetch } = useOwnedNfts();
   const [selected, setSelected] = useState<OwnedNft | null>(null);
 
   const eligible = (data ?? []).filter(isMaxTier);
@@ -86,8 +86,21 @@ export function GameModal({ open, onOpenChange }: { open: boolean; onOpenChange:
               </button>
             </div>
           ) : isLoading ? (
-            <LoadingBlock label="Scanning champions…" />
-          ) : eligible.length === 0 ? (
+            <LoadingBlock label="Loading your champions…" />
+          ) : isError ? (
+            <div className="rounded-[2rem] border-2 border-dashed border-red-200 bg-red-50 p-10 text-center">
+              <p className="btn-text text-red-700">
+                Couldn&apos;t load your champions.{" "}
+                {error instanceof Error ? error.message : "Please try refreshing the page."}
+              </p>
+              <button
+                onClick={() => void refetch()}
+                className="btn fx-9 btn-pill btn-blue mt-4"
+              >
+                <span className="btn-label">Retry</span>
+              </button>
+            </div>
+          ) : !isFetching && eligible.length === 0 ? (
             <div className="rounded-[2rem] border-2 border-dashed border-black/15 bg-[#F4F4F2] p-10 text-center">
               <p className="btn-text text-black">
                 You need a max-tier champion to play.

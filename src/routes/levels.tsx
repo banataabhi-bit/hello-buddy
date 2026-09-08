@@ -77,7 +77,7 @@ export const Route = createFileRoute("/levels")({
 
 function LevelsView() {
   const { address, connect, correctNetwork, switchNetwork } = useWallet();
-  const { data, isLoading } = useOwnedNfts();
+  const { data, isLoading, isFetching, isError, error, refetch } = useOwnedNfts();
 
   const [rarity, setRarity] = useState("all");
   const [status, setStatus] = useState("all");
@@ -141,20 +141,34 @@ function LevelsView() {
               </button>
             </div>
           ) : isLoading ? (
-            <LoadingBlock label="Scanning token IDs…" />
-          ) : list.length === 0 ? (
+            <LoadingBlock label="Loading your champions…" />
+          ) : isError ? (
+            <div className="rounded-[2rem] border-2 border-dashed border-red-200 bg-red-50 p-8 text-center">
+              <p className="btn-text text-red-700">
+                Couldn&apos;t load your champions.{" "}
+                {error instanceof Error ? error.message : "Please try refreshing the page."}
+              </p>
+              <button
+                onClick={() => void refetch()}
+                className="btn fx-9 btn-pill btn-blue mt-4"
+              >
+                <span className="btn-label">Retry</span>
+              </button>
+            </div>
+          ) : !isFetching && list.length === 0 ? (
             <div className="btn-text rounded-[2rem] border-2 border-dashed border-black/15 bg-[#F4F4F2] p-8 text-center text-black/50">
               {data && data.length > 0
                 ? "No champions match these filters."
                 : "You don't own any Litdex champions yet."}
             </div>
-
-          ) : (
+          ) : list.length > 0 ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {list.map((nft) => (
                 <NftCard key={nft.tokenId.toString()} nft={nft} />
               ))}
             </div>
+          ) : (
+            <LoadingBlock label="Refreshing champions…" />
           )}
         </div>
       </div>
