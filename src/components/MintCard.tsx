@@ -146,22 +146,49 @@ export function MintCard() {
   const [publicQty, setPublicQty] = useState(1);
   const publicQtyClamped = Math.max(1, Math.min(publicQty, Math.max(remainingPublic, 1)));
 
+  /**
+   * Ensures the NFT contract can spend `totalCost` USDC.
+   * Awaits the approve receipt AND polls the chain until the new allowance is
+   * actually readable, so the follow-up mint can never hit a stale allowance.
+   */
+  async function ensureAllowance(
+    signer: Awaited<ReturnType<typeof getSigner>>,
+    owner: string,
+    totalCost: bigint,
+  ) {
+    const reader = usdcContract(readProvider());
+    const current = await reader.allowance(owner, NFT_ADDRESS);
+    if (current >= totalCost) return;
+
+    setStatus("Approving USDC…");
+    const approveTx = await usdcContract(signer).approve(NFT_ADDRESS, totalCost);
+    await approveTx.wait(1);
+
+    for (let i = 0; i < 15; i++) {
+      try {
+        const next = await reader.allowance(owner, NFT_ADDRESS);
+        if (next >= totalCost) return;
+      } catch {
+        /* transient RPC error — retry */
+      }
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+    throw new Error("Approval confirmed but allowance not visible yet. Try minting again.");
+  }
+
   async function handleMint(quantity: number) {
     if (!address || price === null || quantity < 1) return;
     const totalCost = price * BigInt(quantity);
     try {
-      const token = usdcContract(readProvider());
-      const allowance = await token.allowance(address, NFT_ADDRESS);
       const signer = await getSigner();
-      if (allowance < totalCost) {
-        setStatus("Approving…");
-        const approveTx = await usdcContract(signer).approve(NFT_ADDRESS, totalCost);
-        await approveTx.wait();
-      }
+      await ensureAllowance(signer, address, totalCost);
+
       setStatus("Minting…");
       const nft = nftContract(signer);
       const tx = await nft.mintBatch(quantity);
-      await tx.wait();
+      await tx.wait(1);
+
+      setStatus("Success");
       try {
         const next = await nftRead().nextTokenId();
         if (next > 1n) setMintedId(next - 1n);
@@ -187,17 +214,9 @@ export function MintCard() {
       0n,
     );
     try {
-      const token = usdcContract(readProvider());
-      const allowance = await token.allowance(address, NFT_ADDRESS);
       const signer = await getSigner();
-      if (allowance < totalCost) {
-        setStatus("Approving…");
-        const approveTx = await usdcContract(signer).approve(
-          NFT_ADDRESS,
-          totalCost,
-        );
-        await approveTx.wait();
-      }
+      await ensureAllowance(signer, address, totalCost);
+
       setStatus("Minting…");
       const nft = nftContract(signer);
       const structs = vouchers.map(
@@ -208,7 +227,9 @@ export function MintCard() {
         vouchers.length === 1
           ? await nft.mintWithVoucher(structs[0]!, signatures[0]!)
           : await nft.mintWithVouchersBatch(structs, signatures);
-      await tx.wait();
+      await tx.wait(1);
+
+      setStatus("Success");
       try {
         const next = await nftRead().nextTokenId();
         if (next > 1n) setMintedId(next - 1n);
