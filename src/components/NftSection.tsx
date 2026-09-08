@@ -74,7 +74,7 @@ function RarityFilter({
 
 export function NftSection() {
   const { address, correctNetwork, switchNetwork } = useWallet();
-  const { data, isLoading } = useOwnedNfts();
+  const { data, isLoading, isFetching, isError, error, refetch } = useOwnedNfts();
   const [rarity, setRarity] = useState<RarityKey>("all");
   const [page, setPage] = useState(0);
 
