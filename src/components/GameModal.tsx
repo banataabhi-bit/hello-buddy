@@ -39,7 +39,7 @@ function ChampionRow({
 
 export function GameModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const { address, connect, connecting, hasWallet, correctNetwork, switchNetwork } = useWallet();
-  const { data, isLoading } = useOwnedNfts();
+  const { data, isLoading, isFetching, isError, error, refetch } = useOwnedNfts();
   const [selected, setSelected] = useState<OwnedNft | null>(null);
 
   const eligible = (data ?? []).filter(isMaxTier);
