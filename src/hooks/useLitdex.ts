@@ -141,6 +141,22 @@ function writeOwnedCache(address: string, nfts: OwnedNft[]) {
   }
 }
 
+type ChampionsApiItem = {
+  tokenId?: string | number;
+  token_id?: string | number;
+  rarity?: number;
+  level?: number;
+  damaged?: boolean;
+  gamesAtMaxLevel?: number;
+  games_at_max_level?: number;
+};
+
+type ChampionsApiResponse =
+  | { totalOwned?: number; champions?: ChampionsApiItem[]; nfts?: ChampionsApiItem[] }
+  | ChampionsApiItem[];
+
+const FETCH_TIMEOUT_MS = 30000;
+
 export function useOwnedNfts() {
   const { address } = useWallet();
   return useQuery({
@@ -150,39 +166,39 @@ export function useOwnedNfts() {
     initialData: () => (address ? readOwnedCache(address) : undefined),
     initialDataUpdatedAt: 0,
     queryFn: async (): Promise<OwnedNft[]> => {
-      const c = nftRead();
-      const next = await c.nextTokenId();
-      const ids: bigint[] = [];
-      for (let i = 1n; i < next; i++) ids.push(i);
-
-      const owners = await Promise.all(
-        ids.map(async (id) => {
-          try {
-            return await c.ownerOf(id);
-          } catch {
-            return null;
-          }
-        }),
-      );
-      const mine = ids.filter((_, i) => {
-        const owner = owners[i];
-        return !!owner && owner.toLowerCase() === address!.toLowerCase();
-      });
-
-      const result = await Promise.all(
-        mine.map(async (tokenId) => {
-          const s = await c.tokenState(tokenId);
+      if (!address) throw new Error("wallet not connected");
+      const url = `${API_BASE}/champions/${address}`;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+      try {
+        const res = await fetch(url, { signal: controller.signal });
+        const json = (await res.json()) as ChampionsApiResponse;
+        console.log("[useOwnedNfts] API response:", json);
+        if (!res.ok) {
+          const err = (json as { error?: string }).error;
+          throw new Error(err ?? `champions fetch failed (${res.status})`);
+        }
+        const items = Array.isArray(json)
+          ? json
+          : json.champions ?? json.nfts ?? [];
+        if (!Array.isArray(items)) {
+          throw new Error("unexpected champions response format");
+        }
+        const result: OwnedNft[] = items.map((item) => {
+          const tokenIdRaw = item.tokenId ?? item.token_id ?? "0";
           return {
-            tokenId,
-            rarity: Number(s[0]),
-            level: Number(s[1]),
-            damaged: Boolean(s[2]),
-            gamesAtMaxLevel: Number(s[3]),
+            tokenId: BigInt(tokenIdRaw),
+            rarity: Number(item.rarity ?? 0),
+            level: Number(item.level ?? 0),
+            damaged: Boolean(item.damaged),
+            gamesAtMaxLevel: Number(item.gamesAtMaxLevel ?? item.games_at_max_level ?? 0),
           };
-        }),
-      );
-      writeOwnedCache(address!, result);
-      return result;
+        });
+        writeOwnedCache(address, result);
+        return result;
+      } finally {
+        clearTimeout(timeout);
+      }
     },
     refetchInterval: 30000,
   });
